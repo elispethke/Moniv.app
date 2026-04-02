@@ -1,0 +1,110 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Design tokens ──────────────────────────────────────────────────────────
+   Dark is the default (:root). Light overrides via the `.light` class on <html>.
+   Tailwind reads colors via rgb(var(--token) / <alpha-value>).
+   ─────────────────────────────────────────────────────────────────────────── */
+:root {
+  /* Brand (constant across themes) */
+  --color-primary:          99  102 241;
+  --color-primary-light:    129 140 248;
+  --color-primary-dark:     79  70  229;
+  --color-primary-fg:       255 255 255;
+
+  --color-secondary:        139 92  246;
+  --color-secondary-light:  167 139 250;
+  --color-secondary-dark:   124 58  237;
+  --color-secondary-fg:     255 255 255;
+
+  --color-accent:           16  185 129;
+  --color-accent-light:     52  211 153;
+  --color-accent-dark:      5   150 105;
+  --color-accent-fg:        255 255 255;
+
+  --color-success:          16  185 129;
+  --color-success-light:    209 250 229;
+  --color-success-fg:       255 255 255;
+
+  --color-danger:           239 68  68;
+  --color-danger-light:     254 226 226;
+  --color-danger-fg:        255 255 255;
+
+  --color-warning:          245 158 11;
+  --color-warning-light:    254 243 199;
+  --color-warning-fg:       255 255 255;
+
+  /* Dark theme — default */
+  --color-bg:               10  10  15;
+  --color-bg-secondary:     17  17  24;
+  --color-surface:          22  22  31;
+  --color-surface-elevated: 30  30  42;
+  --color-surface-border:   37  37  53;
+  --color-fg:               249 250 251;
+  --color-fg-secondary:     209 213 219;
+  --color-fg-muted:         156 163 175;
+  --color-fg-disabled:      75  85  99;
+  --color-muted:            107 114 128;
+  --color-muted-fg:         156 163 175;
+}
+
+/* Light theme override */
+.light {
+  --color-bg:               248 250 252;
+  --color-bg-secondary:     241 245 249;
+  --color-surface:          255 255 255;
+  --color-surface-elevated: 248 250 252;
+  --color-surface-border:   226 232 240;
+  --color-fg:               15  23  42;
+  --color-fg-secondary:     51  65  85;
+  --color-fg-muted:         100 116 139;
+  --color-fg-disabled:      148 163 184;
+  --color-muted:            100 116 139;
+  --color-muted-fg:         148 163 184;
+}
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+    min-height: 100dvh;
+  }
+
+  /* Calendar picker icon: invert only when in dark mode (no .light class) */
+  :not(.light) input[type='date']::-webkit-calendar-picker-indicator {
+    filter: invert(1) opacity(0.5);
+  }
+
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { @apply bg-background; }
+  ::-webkit-scrollbar-thumb { @apply bg-surface-border rounded-full; }
+}
+
+@layer utilities {
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .glass {
+    @apply backdrop-blur-sm bg-surface/80 border border-surface-border;
+  }
+
+  .gradient-text {
+    @apply bg-gradient-primary bg-clip-text text-transparent;
+  }
+}

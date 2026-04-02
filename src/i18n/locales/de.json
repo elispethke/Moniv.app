@@ -1,0 +1,160 @@
+{
+  "common": {
+    "cancel": "Abbrechen",
+    "save": "Änderungen speichern",
+    "loading": "Wird geladen...",
+    "retry": "Erneut versuchen",
+    "add": "Hinzufügen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "close": "Schließen",
+    "back": "Zurück"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "transactions": "Transaktionen",
+    "insights": "Einblicke",
+    "add": "Hinzufügen",
+    "pro": "Pro",
+    "upgrade": "Upgrade"
+  },
+  "dashboard": {
+    "greeting_morning": "Guten Morgen",
+    "greeting_afternoon": "Guten Tag",
+    "greeting_evening": "Guten Abend",
+    "balance_label": "Gesamtsaldo",
+    "positive_balance": "Positiver Saldo",
+    "negative_balance": "Negativer Saldo",
+    "income": "Einnahmen",
+    "expenses": "Ausgaben",
+    "savings_rate": "Sparquote",
+    "recent_transactions": "Letzte Transaktionen",
+    "view_all": "Alle anzeigen",
+    "no_recent": "Noch keine Transaktionen",
+    "expenses_by_category": "Ausgaben nach Kategorie",
+    "monthly_evolution": "Monatliche Entwicklung",
+    "balance_over_time": "Saldoentwicklung",
+    "hide_balance": "Saldo ausblenden",
+    "show_balance": "Saldo anzeigen"
+  },
+  "transactions": {
+    "title": "Transaktionen",
+    "subtitle": "Vollständiger Verlauf",
+    "add_button": "Neu",
+    "empty": "Keine Transaktionen gefunden",
+    "add_first": "Erste Transaktion hinzufügen",
+    "modal_add": "Neue Transaktion",
+    "modal_edit": "Transaktion bearbeiten",
+    "modal_delete": "Löschen bestätigen",
+    "delete_message": "Möchten Sie diese Transaktion wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+    "form": {
+      "income": "Einnahme",
+      "expense": "Ausgabe",
+      "amount": "Betrag",
+      "description": "Beschreibung",
+      "category": "Kategorie",
+      "date": "Datum",
+      "add_button": "Hinzufügen",
+      "save_button": "Änderungen speichern",
+      "amount_placeholder": "0,00",
+      "description_placeholder": "z.B. Supermarkt, Gehalt...",
+      "category_placeholder": "Kategorie auswählen"
+    },
+    "filter": {
+      "all": "Alle",
+      "income": "Einnahmen",
+      "expense": "Ausgaben",
+      "search_placeholder": "Transaktionen suchen..."
+    },
+    "errors": {
+      "amount": "Geben Sie einen gültigen Betrag ein.",
+      "description": "Geben Sie eine Beschreibung ein.",
+      "category": "Wählen Sie eine Kategorie aus.",
+      "date": "Geben Sie ein Datum ein.",
+      "save": "Fehler beim Speichern der Transaktion. Bitte erneut versuchen."
+    }
+  },
+  "insights": {
+    "title": "Einblicke",
+    "subtitle": "Intelligente Analyse Ihrer Finanzen",
+    "no_data": "Noch keine Daten",
+    "no_data_hint": "Fügen Sie Transaktionen hinzu, um personalisierte Einblicke zu sehen",
+    "section_title": "Personalisierte Einblicke",
+    "ai_title": "Moniv AI",
+    "ai_coming_soon": "Bald verfügbar",
+    "ai_coming_soon_desc": "Unser KI-Assistent befindet sich in Entwicklung und wird bald Ihre Ausgaben analysieren und personalisierte Empfehlungen geben.",
+    "savings_achieved_title": "Sparziel erreicht!",
+    "savings_achieved_body": "Ihre Sparquote beträgt {{rate}}, über den empfohlenen 20%. Hervorragende finanzielle Disziplin!",
+    "savings_low_title": "Sparen erhöhen",
+    "savings_low_body": "Ihre Sparquote liegt bei {{rate}}. Empfohlen sind 20% des Einkommens. Versuchen Sie, variable Ausgaben zu reduzieren.",
+    "top_expense_title": "Höchste Ausgabenkategorie",
+    "top_expense_body": "Ihre größten Ausgaben sind in {{category}} ({{pct}}). Eine Überwachung kann helfen, Ihr Budget zu optimieren.",
+    "negative_balance_title": "Achtung: negativer Saldo",
+    "negative_balance_body": "Ihre Ausgaben übersteigen Ihre Einnahmen um {{amount}}. Überprüfen Sie Ihre Ausgaben.",
+    "invest_title": "Investitionspotenzial",
+    "invest_body": "Sie haben {{amount}} verfügbar. Erwägen Sie, einen Teil davon zu investieren.",
+    "tags": {
+      "goal": "Ziel",
+      "tip": "Tipp",
+      "analysis": "Analyse",
+      "alert": "Warnung",
+      "opportunity": "Chance"
+    }
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "theme": {
+      "label": "Design",
+      "dark": "Dunkel",
+      "light": "Hell",
+      "system": "System"
+    },
+    "currency": {
+      "label": "Währung"
+    },
+    "language": {
+      "label": "Sprache"
+    }
+  },
+  "user_menu": {
+    "settings": "Einstellungen",
+    "logout": "Abmelden"
+  },
+  "auth": {
+    "login_title": "Willkommen zurück",
+    "login_subtitle": "Melden Sie sich an",
+    "signup_title": "Konto erstellen",
+    "signup_subtitle": "Starten Sie Ihre finanzielle Reise",
+    "email": "E-Mail",
+    "password": "Passwort",
+    "new_password": "Neues Passwort",
+    "confirm_new_password": "Neues Passwort bestätigen",
+    "full_name": "Vollständiger Name",
+    "login_button": "Anmelden",
+    "signup_button": "Konto erstellen",
+    "no_account": "Noch kein Konto?",
+    "have_account": "Bereits ein Konto?",
+    "signup_link": "Registrieren",
+    "signin_link": "Anmelden",
+    "forgot_password_link": "Passwort vergessen?",
+    "back_to_login": "Zurück zum Login",
+    "forgot_password_title": "Passwort zurücksetzen",
+    "forgot_password_subtitle": "Geben Sie Ihre E-Mail ein, um den Link zu erhalten",
+    "forgot_password_button": "Link senden",
+    "forgot_password_email_sent": "Überprüfen Sie Ihre E-Mail.",
+    "reset_password_title": "Neues Passwort erstellen",
+    "reset_password_subtitle": "Wählen Sie ein sicheres Passwort",
+    "reset_password_button": "Passwort aktualisieren",
+    "errors": {
+      "invalid_credentials": "Falsche E-Mail oder Passwort.",
+      "email_not_confirmed": "Bitte bestätigen Sie Ihre E-Mail.",
+      "already_registered": "Diese E-Mail ist bereits registriert.",
+      "weak_password": "Passwort muss mindestens 6 Zeichen lang sein.",
+      "invalid_email": "Ungültiges E-Mail-Format.",
+      "signup_disabled": "Registrierung deaktiviert.",
+      "rate_limit": "Zu viele Versuche. Bitte warten.",
+      "email_not_authorized": "Diese E-Mail ist nicht erlaubt.",
+      "unexpected": "Ein unerwarteter Fehler ist aufgetreten."
+    }
+  }
+}
