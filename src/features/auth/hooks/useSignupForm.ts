@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuthStore } from '@/store/useAuthStore'
 import { useTranslation } from '@/hooks/useTranslation'
+import { referralService } from '@/services/referralService'
 import { mapAuthError } from '../utils/authErrors'
 
 interface SignupFields {
@@ -18,6 +19,10 @@ export function useSignupForm() {
   const { signup } = useAuthStore()
   const navigate = useNavigate()
   const { t } = useTranslation()
+  const [searchParams] = useSearchParams()
+
+  // Capture referrer ID from URL (?ref=USER_ID)
+  const referrerId = searchParams.get('ref') ?? null
 
   const [fields, setFields] = useState<SignupFields>({
     fullName: '',
@@ -57,6 +62,16 @@ export function useSignupForm() {
     setApiError(null)
     try {
       await signup(fields.email.trim(), fields.password, fields.fullName.trim())
+
+      // Record referral if the user signed up via a referral link
+      const newUser = useAuthStore.getState().user
+      if (referrerId && newUser && referrerId !== newUser.id) {
+        // Fire-and-forget — don't block signup on referral errors
+        referralService
+          .recordReferral(referrerId, newUser.id)
+          .catch(() => { /* ignore */ })
+      }
+
       setIsSuccess(true)
       navigate('/transactions', { replace: true })
     } catch (err) {

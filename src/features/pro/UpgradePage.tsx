@@ -2,6 +2,7 @@ import { useState, type ReactNode } from 'react'
 import {
   Sparkles, Check, BarChart2, Target, Download,
   CreditCard, RefreshCw, Wallet, ArrowLeft, AlertCircle, Crown,
+  Settings2, LifeBuoy,
 } from 'lucide-react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { PageLayout } from '@/components/layout/PageLayout'
@@ -11,6 +12,7 @@ import { ProBadge } from '@/components/ui/ProBadge'
 import { useTranslation } from '@/hooks/useTranslation'
 import { usePlanStore } from '@/store/usePlanStore'
 import { useCheckout } from '@/hooks/useCheckout'
+import { useBillingPortal } from '@/hooks/useBillingPortal'
 import { cn } from '@/utils/cn'
 
 interface BenefitItem {
@@ -35,6 +37,8 @@ export function UpgradePage() {
   const { plan } = usePlanStore()
   const { startCheckout, loadingPlan, error } = useCheckout()
   const [selected, setSelected] = useState<'monthly' | 'yearly'>('yearly')
+
+  const { openBillingPortal, isLoading: isPortalLoading, error: portalError } = useBillingPortal()
 
   const isAlreadyPro = plan === 'pro'
   // ?canceled=true is appended by the Stripe redirect on cancel
@@ -157,10 +161,56 @@ export function UpgradePage() {
 
         {/* CTA */}
         {isAlreadyPro ? (
-          <div className="rounded-2xl border border-accent/30 bg-success/10 p-4 text-center">
-            <Check className="mx-auto mb-2 h-6 w-6 text-accent" />
-            <p className="text-sm font-semibold text-foreground">{t('pro.already_pro')}</p>
-            <p className="text-xs text-muted-foreground mt-1">{t('pro.already_pro_desc')}</p>
+          <div className="space-y-3">
+            {/* Already Pro confirmation */}
+            <div className="rounded-2xl border border-accent/30 bg-success/10 p-4 text-center">
+              <Check className="mx-auto mb-2 h-6 w-6 text-accent" />
+              <p className="text-sm font-semibold text-foreground">{t('pro.already_pro')}</p>
+              <p className="text-xs text-muted-foreground mt-1">{t('pro.already_pro_desc')}</p>
+            </div>
+
+            {/* Portal error */}
+            {portalError && (
+              <div className="flex items-center gap-3 rounded-2xl border border-danger/30 bg-danger/10 px-4 py-3 text-sm">
+                <AlertCircle className="h-5 w-5 flex-shrink-0 text-danger" />
+                <span className="text-foreground">{portalError}</span>
+              </div>
+            )}
+
+            {/* Manage / Cancel subscription */}
+            <Button
+              variant="outline"
+              fullWidth
+              size="md"
+              isLoading={isPortalLoading}
+              onClick={openBillingPortal}
+              className="gap-2"
+            >
+              <Settings2 className="h-4 w-4" />
+              {t('pro.manage_subscription')}
+            </Button>
+            <p className="text-center text-[11px] text-muted-foreground">
+              {t('pro.billing_portal_desc')}
+            </p>
+
+            {/* Support */}
+            <div className="flex items-center justify-center gap-2 pt-1">
+              <LifeBuoy className="h-3.5 w-3.5 text-muted-foreground" />
+              <span className="text-xs text-muted-foreground">
+                {t('pro.support_title')}{' '}
+                <a
+                  href="mailto:support@moniv.app"
+                  className="font-medium text-primary hover:underline"
+                >
+                  support@moniv.app
+                </a>
+              </span>
+            </div>
+
+            {/* Legal */}
+            <p className="text-center text-[11px] text-muted-foreground">
+              {t('pro.cancel_anytime_legal')}
+            </p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -178,6 +228,17 @@ export function UpgradePage() {
             <p className="text-center text-[11px] text-muted-foreground">
               {t('pro.upgrade_disclaimer')}
             </p>
+
+            {/* Support link for non-Pro users too */}
+            <div className="flex items-center justify-center gap-2">
+              <LifeBuoy className="h-3.5 w-3.5 text-muted-foreground" />
+              <a
+                href="mailto:support@moniv.app"
+                className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+              >
+                support@moniv.app
+              </a>
+            </div>
           </div>
         )}
       </div>

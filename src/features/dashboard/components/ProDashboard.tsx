@@ -1,4 +1,4 @@
-import { ArrowUpCircle, ArrowDownCircle, Sparkles, Crown, FileDown, TrendingUp, TrendingDown, Minus } from 'lucide-react'
+import { ArrowUpCircle, ArrowDownCircle, Sparkles, Crown, FileDown, TrendingUp, TrendingDown, Minus, Share2 } from 'lucide-react'
 import { PageLayout } from '@/components/layout/PageLayout'
 import { BalanceHero } from './BalanceHero'
 import { RecentTransactions } from './RecentTransactions'
@@ -12,6 +12,7 @@ import { Card, CardBody } from '@/components/ui/Card'
 import { useTransactions } from '@/hooks/useTransactions'
 import { useFormatters } from '@/hooks/useFormatters'
 import { usePdfExport } from '@/hooks/usePdfExport'
+import { useShareSnapshot } from '@/hooks/useShareSnapshot'
 import { usePeriodStore } from '@/store/usePeriodStore'
 import { useAuthStore } from '@/store/useAuthStore'
 import { useTranslation } from '@/hooks/useTranslation'
@@ -167,6 +168,8 @@ export function ProDashboard({ showSuccessBanner }: Props) {
   }
   const periodLabel = periodLabelMap[preset] ?? preset
 
+  const { isCapturing, shareSnapshot } = useShareSnapshot()
+
   const { exportPdf, isExporting } = usePdfExport({
     periodLabel,
     transactions: periodTx,
@@ -214,6 +217,14 @@ export function ProDashboard({ showSuccessBanner }: Props) {
           </h1>
         </div>
         <div className="mt-1 flex shrink-0 items-center gap-2">
+          <button
+            onClick={shareSnapshot}
+            disabled={isCapturing}
+            className="flex items-center gap-1.5 rounded-xl border border-surface-border bg-surface-elevated px-3 py-2 text-xs font-semibold text-foreground-secondary transition-all hover:bg-surface hover:text-foreground active:scale-95 disabled:opacity-50"
+          >
+            <Share2 className="h-3.5 w-3.5" />
+            {isCapturing ? t('snapshot.downloading') : t('snapshot.share')}
+          </button>
           <button
             onClick={exportPdf}
             disabled={isExporting}

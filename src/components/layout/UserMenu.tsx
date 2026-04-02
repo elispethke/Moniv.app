@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
-import { Settings, LogOut, ChevronDown, Shield } from 'lucide-react'
+import {
+  Settings, LogOut, ChevronDown, Shield, Users, LifeBuoy,
+} from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/useAuthStore'
 import { useUIStore } from '@/store/useUIStore'
@@ -7,6 +9,8 @@ import { usePlanStore } from '@/store/usePlanStore'
 import { useTranslation } from '@/hooks/useTranslation'
 import { toUserProfile, getInitials } from '@/types/user'
 import { isAdmin } from '@/lib/features'
+import { CURRENCIES, useSettingsStore } from '@/store/useSettingsStore'
+import { ReferralModal } from '@/features/referral/ReferralModal'
 import { cn } from '@/utils/cn'
 
 export function UserMenu() {
@@ -14,8 +18,10 @@ export function UserMenu() {
   const { openModal } = useUIStore()
   const { role } = usePlanStore()
   const { t } = useTranslation()
+  const { currency, setCurrency } = useSettingsStore()
   const navigate = useNavigate()
   const [open, setOpen] = useState(false)
+  const [showReferral, setShowReferral] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
   const profile = user ? toUserProfile(user) : null
@@ -43,74 +49,124 @@ export function UserMenu() {
   }, [])
 
   return (
-    <div ref={ref} className="relative">
-      <button
-        onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-2 rounded-full p-0.5 transition-all duration-200 hover:ring-2 hover:ring-primary/40 focus:outline-none focus:ring-2 focus:ring-primary/60"
-        aria-haspopup="true"
-        aria-expanded={open}
-        aria-label="User menu"
-      >
-        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-primary text-xs font-bold text-primary-foreground shadow-glow-primary">
-          {initials}
-        </div>
-        <ChevronDown
-          className={cn(
-            'h-3.5 w-3.5 text-muted-foreground transition-transform duration-200',
-            open && 'rotate-180'
-          )}
-        />
-      </button>
-
-      {open && (
-        <div
-          role="menu"
-          className={cn(
-            'absolute right-0 top-full mt-2 w-52 overflow-hidden rounded-2xl border border-surface-border',
-            'bg-surface shadow-glass animate-scale-in z-50'
-          )}
+    <>
+      <div ref={ref} className="relative">
+        <button
+          onClick={() => setOpen((v) => !v)}
+          className="flex items-center gap-2 rounded-full p-0.5 transition-all duration-200 hover:ring-2 hover:ring-primary/40 focus:outline-none focus:ring-2 focus:ring-primary/60"
+          aria-haspopup="true"
+          aria-expanded={open}
+          aria-label="User menu"
         >
-          {/* Profile header */}
-          <div className="border-b border-surface-border px-4 py-3">
-            <p className="truncate text-sm font-semibold text-foreground">
-              {profile?.fullName ?? 'Usuário'}
-            </p>
-            <p className="truncate text-xs text-muted-foreground">{profile?.email}</p>
+          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-primary text-xs font-bold text-primary-foreground shadow-glow-primary">
+            {initials}
           </div>
+          <ChevronDown
+            className={cn(
+              'h-3.5 w-3.5 text-muted-foreground transition-transform duration-200',
+              open && 'rotate-180',
+            )}
+          />
+        </button>
 
-          {/* Menu items */}
-          <div className="p-1">
-            {showAdmin && (
+        {open && (
+          <div
+            role="menu"
+            className={cn(
+              'absolute right-0 top-full mt-2 w-56 overflow-hidden rounded-2xl border border-surface-border',
+              'bg-surface shadow-glass animate-scale-in z-50',
+            )}
+          >
+            {/* Profile header */}
+            <div className="border-b border-surface-border px-4 py-3">
+              <p className="truncate text-sm font-semibold text-foreground">
+                {profile?.fullName ?? 'Usuário'}
+              </p>
+              <p className="truncate text-xs text-muted-foreground">{profile?.email}</p>
+            </div>
+
+            {/* Menu items */}
+            <div className="p-1">
+              {showAdmin && (
+                <button
+                  role="menuitem"
+                  onClick={() => { navigate('/admin'); setOpen(false) }}
+                  className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-primary transition-colors hover:bg-primary/10"
+                >
+                  <Shield className="h-4 w-4 flex-shrink-0" />
+                  Admin
+                </button>
+              )}
+
+              {/* Invite a friend */}
               <button
                 role="menuitem"
-                onClick={() => { navigate('/admin'); setOpen(false) }}
-                className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-primary transition-colors hover:bg-primary/10"
+                onClick={() => { setShowReferral(true); setOpen(false) }}
+                className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-foreground-secondary transition-colors hover:bg-primary/10 hover:text-primary"
               >
-                <Shield className="h-4 w-4 flex-shrink-0" />
-                Admin
+                <Users className="h-4 w-4 flex-shrink-0" />
+                {t('user_menu.invite')}
               </button>
-            )}
 
-            <button
-              role="menuitem"
-              onClick={() => { openModal('settings'); setOpen(false) }}
-              className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-foreground-secondary transition-colors hover:bg-surface-elevated hover:text-foreground"
-            >
-              <Settings className="h-4 w-4 flex-shrink-0" />
-              {t('user_menu.settings')}
-            </button>
+              {/* Settings */}
+              <button
+                role="menuitem"
+                onClick={() => { openModal('settings'); setOpen(false) }}
+                className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-foreground-secondary transition-colors hover:bg-surface-elevated hover:text-foreground"
+              >
+                <Settings className="h-4 w-4 flex-shrink-0" />
+                {t('user_menu.settings')}
+              </button>
 
-            <button
-              role="menuitem"
-              onClick={() => { logout(); setOpen(false) }}
-              className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-danger transition-colors hover:bg-danger/10"
-            >
-              <LogOut className="h-4 w-4 flex-shrink-0" />
-              {t('user_menu.logout')}
-            </button>
+              {/* Currency selector — inline */}
+              <div className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm text-foreground-secondary">
+                <span className="text-sm text-muted-foreground flex-shrink-0">💱</span>
+                <span className="text-sm text-foreground-secondary flex-shrink-0">
+                  {t('user_menu.currency')}
+                </span>
+                <select
+                  value={currency}
+                  onChange={(e) => setCurrency(e.target.value)}
+                  className="ml-auto rounded-lg border border-surface-border bg-surface-elevated px-2 py-1 text-xs font-semibold text-foreground appearance-none focus:outline-none focus:ring-1 focus:ring-primary/50"
+                >
+                  {CURRENCIES.map((c) => (
+                    <option key={c.value} value={c.value}>{c.value}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Support */}
+              <a
+                role="menuitem"
+                href="mailto:support@moniv.app"
+                onClick={() => setOpen(false)}
+                className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-foreground-secondary transition-colors hover:bg-surface-elevated hover:text-foreground"
+              >
+                <LifeBuoy className="h-4 w-4 flex-shrink-0" />
+                {t('user_menu.support')}
+              </a>
+
+              {/* Divider */}
+              <div className="my-1 border-t border-surface-border" />
+
+              {/* Logout */}
+              <button
+                role="menuitem"
+                onClick={() => { logout(); setOpen(false) }}
+                className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-danger transition-colors hover:bg-danger/10"
+              >
+                <LogOut className="h-4 w-4 flex-shrink-0" />
+                {t('user_menu.logout')}
+              </button>
+            </div>
           </div>
-        </div>
+        )}
+      </div>
+
+      {/* Referral modal — rendered outside the dropdown */}
+      {showReferral && (
+        <ReferralModal onClose={() => setShowReferral(false)} />
       )}
-    </div>
+    </>
   )
 }

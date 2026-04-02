@@ -118,7 +118,25 @@
   },
   "user_menu": {
     "settings": "Settings",
-    "logout": "Sign out"
+    "logout": "Sign out",
+    "invite": "Invite a friend",
+    "support": "Support",
+    "currency": "Currency"
+  },
+  "referral": {
+    "title": "Invite a friend",
+    "subtitle": "Invite 1 friend → earn 1 month Pro free",
+    "reward_title": "1 month Pro free",
+    "reward_desc": "For every friend who signs up with your link",
+    "your_link": "Your referral link",
+    "copy": "Copy link",
+    "copied": "Copied!",
+    "share": "Share",
+    "terms": "Reward applied after your friend creates an account"
+  },
+  "snapshot": {
+    "share": "Share progress",
+    "downloading": "Generating..."
   },
   "auth": {
     "login_title": "Welcome back",
@@ -283,7 +301,12 @@
     "export_success": "File downloaded successfully.",
     "payment_success": "Payment successful! Your Pro plan is being activated — refresh in a moment.",
     "payment_cancelled": "Payment cancelled. No charge was made.",
-    "payment_error": "Payment failed. Please try again."
+    "payment_error": "Payment failed. Please try again.",
+    "manage_subscription": "Manage subscription",
+    "cancel_subscription": "Cancel subscription",
+    "billing_portal_desc": "Manage your plan, billing and payment method in the customer portal.",
+    "support_title": "Need help?",
+    "cancel_anytime_legal": "Cancel anytime. No commitment. Your data stays safe."
   },
   "charts": {
     "no_expenses": "No expenses recorded",

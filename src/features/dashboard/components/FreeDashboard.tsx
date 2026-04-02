@@ -1,4 +1,4 @@
-import { ArrowUpCircle, ArrowDownCircle, Crown, Lock, Sparkles } from 'lucide-react'
+import { ArrowUpCircle, ArrowDownCircle, Crown, Lock, Sparkles, Share2 } from 'lucide-react'
 import { PageLayout } from '@/components/layout/PageLayout'
 import { BalanceHero } from './BalanceHero'
 import { RecentTransactions } from './RecentTransactions'
@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/Button'
 import { PeriodSelector } from '@/components/ui/PeriodSelector'
 import { useTransactions } from '@/hooks/useTransactions'
 import { useFormatters } from '@/hooks/useFormatters'
+import { useShareSnapshot } from '@/hooks/useShareSnapshot'
 import { useUIStore } from '@/store/useUIStore'
 import { usePeriodStore } from '@/store/usePeriodStore'
 import { useAuthStore } from '@/store/useAuthStore'
@@ -26,6 +27,7 @@ export function FreeDashboard({ showSuccessBanner }: Props) {
   const { formatCurrency } = useFormatters()
   const { openModal } = useUIStore()
   const { t } = useTranslation()
+  const { isCapturing, shareSnapshot } = useShareSnapshot()
 
   const profile = user ? toUserProfile(user) : null
   const h = new Date().getHours()
@@ -66,7 +68,15 @@ export function FreeDashboard({ showSuccessBanner }: Props) {
             {profile?.fullName.split(' ')[0] ?? 'Usuário'} 👋
           </h1>
         </div>
-        <div className="mt-1">
+        <div className="mt-1 flex shrink-0 items-center gap-2">
+          <button
+            onClick={shareSnapshot}
+            disabled={isCapturing}
+            className="flex items-center gap-1.5 rounded-xl border border-surface-border bg-surface-elevated px-3 py-2 text-xs font-semibold text-foreground-secondary transition-all hover:bg-surface hover:text-foreground active:scale-95 disabled:opacity-50"
+          >
+            <Share2 className="h-3.5 w-3.5" />
+            {isCapturing ? t('snapshot.downloading') : t('snapshot.share')}
+          </button>
           <PeriodSelector />
         </div>
       </div>

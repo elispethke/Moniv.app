@@ -118,7 +118,25 @@
   },
   "user_menu": {
     "settings": "Configurações",
-    "logout": "Sair"
+    "logout": "Sair",
+    "invite": "Convidar amigo",
+    "support": "Suporte",
+    "currency": "Moeda"
+  },
+  "referral": {
+    "title": "Convidar amigo",
+    "subtitle": "Convide 1 amigo → ganhe 1 mês Pro grátis",
+    "reward_title": "1 mês Pro grátis",
+    "reward_desc": "Para cada amigo que se cadastrar com seu link",
+    "your_link": "Seu link de indicação",
+    "copy": "Copiar link",
+    "copied": "Copiado!",
+    "share": "Compartilhar",
+    "terms": "Recompensa aplicada após seu amigo criar uma conta"
+  },
+  "snapshot": {
+    "share": "Compartilhar progresso",
+    "downloading": "Gerando..."
   },
   "auth": {
     "login_title": "Bem-vindo de volta",
@@ -283,7 +301,12 @@
     "export_success": "Arquivo baixado com sucesso.",
     "payment_success": "Pagamento realizado! Seu plano Pro está sendo ativado — aguarde um momento.",
     "payment_cancelled": "Pagamento cancelado. Nenhuma cobrança foi feita.",
-    "payment_error": "Falha no pagamento. Tente novamente."
+    "payment_error": "Falha no pagamento. Tente novamente.",
+    "manage_subscription": "Gerenciar assinatura",
+    "cancel_subscription": "Cancelar assinatura",
+    "billing_portal_desc": "Gerencie seu plano, cobrança e forma de pagamento no portal do cliente.",
+    "support_title": "Precisa de ajuda?",
+    "cancel_anytime_legal": "Cancele quando quiser. Sem compromisso. Seus dados ficam seguros."
   },
   "charts": {
     "no_expenses": "Nenhuma despesa registrada",

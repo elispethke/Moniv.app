@@ -118,7 +118,25 @@
   },
   "user_menu": {
     "settings": "Einstellungen",
-    "logout": "Abmelden"
+    "logout": "Abmelden",
+    "invite": "Freund einladen",
+    "support": "Support",
+    "currency": "Währung"
+  },
+  "referral": {
+    "title": "Freund einladen",
+    "subtitle": "1 Freund einladen → 1 Monat Pro kostenlos",
+    "reward_title": "1 Monat Pro kostenlos",
+    "reward_desc": "Für jeden Freund, der sich über deinen Link anmeldet",
+    "your_link": "Dein Empfehlungslink",
+    "copy": "Link kopieren",
+    "copied": "Kopiert!",
+    "share": "Teilen",
+    "terms": "Belohnung wird angewendet, wenn sich dein Freund registriert"
+  },
+  "snapshot": {
+    "share": "Fortschritt teilen",
+    "downloading": "Wird erstellt..."
   },
   "auth": {
     "login_title": "Willkommen zurück",
@@ -156,5 +174,18 @@
       "email_not_authorized": "Diese E-Mail ist nicht erlaubt.",
       "unexpected": "Ein unerwarteter Fehler ist aufgetreten."
     }
+  },
+  "pro": {
+    "payment_success": "Zahlung erfolgreich! Ihr Pro-Plan wird aktiviert.",
+    "payment_cancelled": "Zahlung abgebrochen. Es wurde nichts berechnet.",
+    "payment_error": "Zahlung fehlgeschlagen. Bitte versuchen Sie es erneut.",
+    "manage_subscription": "Abonnement verwalten",
+    "cancel_subscription": "Abonnement kündigen",
+    "billing_portal_desc": "Verwalten Sie Ihren Plan, Abrechnung und Zahlungsmethode im Kundenportal.",
+    "support_title": "Hilfe benötigt?",
+    "cancel_anytime_legal": "Jederzeit kündbar. Keine Verpflichtung. Ihre Daten bleiben sicher.",
+    "already_pro": "Sie haben bereits Pro!",
+    "already_pro_desc": "Alle Funktionen sind freigeschaltet.",
+    "upgrade_disclaimer": "Jederzeit kündbar. Keine Verpflichtung."
   }
 }

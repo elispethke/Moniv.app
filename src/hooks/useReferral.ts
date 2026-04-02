@@ -1,0 +1,47 @@
+import { useState } from 'react'
+import { useAuthStore } from '@/store/useAuthStore'
+
+const APP_URL = 'https://moniv.app'
+
+export function useReferral() {
+  const { user } = useAuthStore()
+  const [copied, setCopied] = useState(false)
+
+  const referralLink = user ? `${APP_URL}/signup?ref=${user.id}` : null
+
+  const copyLink = async () => {
+    if (!referralLink) return
+    try {
+      await navigator.clipboard.writeText(referralLink)
+    } catch {
+      // Fallback for browsers without clipboard API
+      const el = document.createElement('input')
+      el.value = referralLink
+      document.body.appendChild(el)
+      el.select()
+      document.execCommand('copy')
+      document.body.removeChild(el)
+    }
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  const shareLink = async () => {
+    if (!referralLink) return
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Moniv — Smart Personal Finance',
+          text: 'Join me on Moniv and take control of your finances! 🚀',
+          url: referralLink,
+        })
+        return
+      } catch {
+        // User cancelled or share failed — fall through to copy
+      }
+    }
+    await copyLink()
+  }
+
+  return { referralLink, copyLink, shareLink, copied }
+}
