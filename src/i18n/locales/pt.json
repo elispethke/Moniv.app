@@ -132,7 +132,10 @@
     "copy": "Copiar link",
     "copied": "Copiado!",
     "share": "Compartilhar",
-    "terms": "Recompensa aplicada após seu amigo criar uma conta"
+    "terms": "Recompensa aplicada após seu amigo criar uma conta",
+    "progress_label": "Seus indicados",
+    "count": "{{count}} amigo(s) indicado(s)",
+    "count_zero": "Nenhum amigo indicado ainda"
   },
   "snapshot": {
     "share": "Compartilhar progresso",

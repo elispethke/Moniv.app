@@ -4,6 +4,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useAuthStore } from '@/store/useAuthStore'
 import { useTranslation } from '@/hooks/useTranslation'
 import { referralService } from '@/services/referralService'
+import { analytics } from '@/utils/analytics'
 import { mapAuthError } from '../utils/authErrors'
 
 interface SignupFields {
@@ -69,7 +70,8 @@ export function useSignupForm() {
         // Fire-and-forget — don't block signup on referral errors
         referralService
           .recordReferral(referrerId, newUser.id)
-          .catch(() => { /* ignore */ })
+          .then(() => analytics.referralRecorded(true))
+          .catch(() => analytics.referralRecorded(false))
       }
 
       setIsSuccess(true)

@@ -132,7 +132,10 @@
     "copy": "Link kopieren",
     "copied": "Kopiert!",
     "share": "Teilen",
-    "terms": "Belohnung wird angewendet, wenn sich dein Freund registriert"
+    "terms": "Belohnung wird angewendet, wenn sich dein Freund registriert",
+    "progress_label": "Deine Empfehlungen",
+    "count": "{{count}} Freund(e) eingeladen",
+    "count_zero": "Noch keine Freunde eingeladen"
   },
   "snapshot": {
     "share": "Fortschritt teilen",

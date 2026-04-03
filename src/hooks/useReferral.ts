@@ -1,13 +1,25 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuthStore } from '@/store/useAuthStore'
+import { referralService } from '@/services/referralService'
+import { analytics } from '@/utils/analytics'
 
 const APP_URL = 'https://moniv.app'
 
 export function useReferral() {
   const { user } = useAuthStore()
   const [copied, setCopied] = useState(false)
+  const [referralCount, setReferralCount] = useState(0)
 
   const referralLink = user ? `${APP_URL}/signup?ref=${user.id}` : null
+
+  // Fetch referral count once per user session
+  useEffect(() => {
+    if (!user?.id) return
+    referralService
+      .getReferralCount(user.id)
+      .then(setReferralCount)
+      .catch(() => { /* non-blocking */ })
+  }, [user?.id])
 
   const copyLink = async () => {
     if (!referralLink) return
@@ -23,6 +35,7 @@ export function useReferral() {
       document.body.removeChild(el)
     }
     setCopied(true)
+    analytics.referralShared('copy')
     setTimeout(() => setCopied(false), 2000)
   }
 
@@ -35,6 +48,7 @@ export function useReferral() {
           text: 'Join me on Moniv and take control of your finances! 🚀',
           url: referralLink,
         })
+        analytics.referralShared('native_share')
         return
       } catch {
         // User cancelled or share failed — fall through to copy
@@ -43,5 +57,5 @@ export function useReferral() {
     await copyLink()
   }
 
-  return { referralLink, copyLink, shareLink, copied }
+  return { referralLink, copyLink, shareLink, copied, referralCount }
 }

@@ -132,7 +132,10 @@
     "copy": "Copy link",
     "copied": "Copied!",
     "share": "Share",
-    "terms": "Reward applied after your friend creates an account"
+    "terms": "Reward applied after your friend creates an account",
+    "progress_label": "Your referrals",
+    "count": "{{count}} friend(s) referred",
+    "count_zero": "No friends referred yet"
   },
   "snapshot": {
     "share": "Share progress",
