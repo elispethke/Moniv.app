@@ -238,46 +238,88 @@ export function ProDashboard({ showSuccessBanner }: Props) {
       </div>
 
       <div className="space-y-4">
-        {/* 1. Balance Hero */}
-        <BalanceHero summary={{ totalIncome, totalExpense, balance, savingsRate }} />
+        {/* Row 1: 2-column on lg — hero/KPIs left, trend chart right */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {/* LEFT — balance + sparklines */}
+          <div className="space-y-3">
+            <BalanceHero summary={{ totalIncome, totalExpense, balance, savingsRate }} />
 
-        {/* 2. KPI Sparkline row */}
-        <div className="flex gap-2.5">
-          <SparklineCard
-            variant="income"
-            label={t('dashboard.income')}
-            value={formatCurrency(totalIncome)}
-            icon={<ArrowUpCircle className="h-3.5 w-3.5" />}
-            valueColor="text-accent"
-            trend={incomeTrend}
-            sparkData={incomeSparkData}
-            sparkColor="#10b981"
-          />
-          <SparklineCard
-            variant="expense"
-            label={t('dashboard.expenses')}
-            value={formatCurrency(totalExpense)}
-            icon={<ArrowDownCircle className="h-3.5 w-3.5" />}
-            valueColor="text-danger"
-            trend={expenseTrend}
-            trendInverse
-            sparkData={expenseSparkData}
-            sparkColor="#ef4444"
-          />
-          <SparklineCard
-            variant="savings"
-            label={t('dashboard.savings_rate')}
-            value={formatPercentage(savingsRate, 0)}
-            icon={<Sparkles className="h-3.5 w-3.5" />}
-            valueColor="text-primary"
-            trend={savingsTrend}
-            sparkData={savingsSparkData}
-            sparkColor="#6366f1"
-          />
+            {/* KPI Sparkline row — 3-col grid */}
+            <div className="grid grid-cols-3 gap-2.5">
+              <SparklineCard
+                variant="income"
+                label={t('dashboard.income')}
+                value={formatCurrency(totalIncome)}
+                icon={<ArrowUpCircle className="h-3.5 w-3.5" />}
+                valueColor="text-accent"
+                trend={incomeTrend}
+                sparkData={incomeSparkData}
+                sparkColor="#10b981"
+              />
+              <SparklineCard
+                variant="expense"
+                label={t('dashboard.expenses')}
+                value={formatCurrency(totalExpense)}
+                icon={<ArrowDownCircle className="h-3.5 w-3.5" />}
+                valueColor="text-danger"
+                trend={expenseTrend}
+                trendInverse
+                sparkData={expenseSparkData}
+                sparkColor="#ef4444"
+              />
+              <SparklineCard
+                variant="savings"
+                label={t('dashboard.savings_rate')}
+                value={formatPercentage(savingsRate, 0)}
+                icon={<Sparkles className="h-3.5 w-3.5" />}
+                valueColor="text-primary"
+                trend={savingsTrend}
+                sparkData={savingsSparkData}
+                sparkColor="#6366f1"
+              />
+            </div>
+          </div>
+
+          {/* RIGHT — trend chart (primary analysis) */}
+          <div>
+            {monthlyData.length >= 2 ? (
+              <ChartSection
+                title="Receitas & Despesas"
+                sub="Evolução mensal comparativa"
+                glow
+              >
+                <TrendLineChart data={monthlyData} />
+              </ChartSection>
+            ) : (
+              /* Fallback: insights panel when no trend data yet */
+              showTrend && (incomeTrend !== null || expenseTrend !== null || savingsTrend !== null) ? (
+                <div>
+                  <p className="mb-2 text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                    Insights financeiros
+                  </p>
+                  <div className="grid grid-cols-2 gap-2.5">
+                    <InsightCard
+                      label="Taxa de poupança"
+                      value={formatPercentage(savingsRate, 1)}
+                      trend={savingsTrend}
+                      accent="border-primary/20 bg-primary/5"
+                    />
+                    <InsightCard
+                      label="Despesas"
+                      value={formatCurrency(totalExpense)}
+                      trend={expenseTrend}
+                      trendInverse
+                      accent="border-danger/20 bg-danger/5"
+                    />
+                  </div>
+                </div>
+              ) : null
+            )}
+          </div>
         </div>
 
-        {/* 3. Financial insights panel */}
-        {showTrend && (incomeTrend !== null || expenseTrend !== null || savingsTrend !== null) && (
+        {/* Financial insights panel — shown below when trend chart is visible */}
+        {monthlyData.length >= 2 && showTrend && (incomeTrend !== null || expenseTrend !== null || savingsTrend !== null) && (
           <div>
             <p className="mb-2 text-xs font-bold uppercase tracking-widest text-muted-foreground">
               Insights financeiros
@@ -317,20 +359,9 @@ export function ProDashboard({ showSuccessBanner }: Props) {
           </div>
         )}
 
-        {/* 4. Trend Line Chart */}
-        {monthlyData.length >= 2 && (
-          <ChartSection
-            title="Receitas & Despesas"
-            sub="Evolução mensal comparativa"
-            glow
-          >
-            <TrendLineChart data={monthlyData} />
-          </ChartSection>
-        )}
-
-        {/* 5. Expense Pie + Category Breakdown side by side on tablet, stacked on mobile */}
+        {/* Row 2: Analytics grid — 2-col on md+ */}
         {categoryTotals.length > 0 && (
-          <>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <ChartSection
               title={t('dashboard.expenses_by_category')}
               sub={`${categoryTotals.length} categorias · ${formatCurrency(totalExpense)}`}
@@ -344,10 +375,10 @@ export function ProDashboard({ showSuccessBanner }: Props) {
             >
               <CategoryBreakdown data={categoryTotals} />
             </ChartSection>
-          </>
+          </div>
         )}
 
-        {/* 6. Monthly Bar Chart */}
+        {/* Row 3: Monthly bar chart — full width */}
         {monthlyData.length > 1 && (
           <ChartSection
             title={t('dashboard.monthly_evolution')}
@@ -358,7 +389,7 @@ export function ProDashboard({ showSuccessBanner }: Props) {
           </ChartSection>
         )}
 
-        {/* 7. Recent transactions */}
+        {/* Recent transactions */}
         <RecentTransactions transactions={periodTx} />
 
         {/* Empty state */}

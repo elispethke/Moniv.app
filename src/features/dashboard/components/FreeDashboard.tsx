@@ -1,4 +1,4 @@
-import { ArrowUpCircle, ArrowDownCircle, Crown, Lock, Sparkles, Share2 } from 'lucide-react'
+import { ArrowUpCircle, ArrowDownCircle, Crown, Lock, Sparkles, Share2, BarChart2, Target, RefreshCw, Wallet } from 'lucide-react'
 import { PageLayout } from '@/components/layout/PageLayout'
 import { BalanceHero } from './BalanceHero'
 import { RecentTransactions } from './RecentTransactions'
@@ -19,6 +19,13 @@ import { filterByPeriod, calculateCategoryTotals } from '@/utils/calculations'
 interface Props {
   showSuccessBanner: boolean
 }
+
+const PRO_BENEFITS = [
+  { icon: <BarChart2 className="h-3.5 w-3.5" />, label: 'Gráficos de tendência e evolução mensal' },
+  { icon: <Target className="h-3.5 w-3.5" />,    label: 'Metas financeiras com progresso visual' },
+  { icon: <RefreshCw className="h-3.5 w-3.5" />, label: 'Gestão de despesas recorrentes' },
+  { icon: <Wallet className="h-3.5 w-3.5" />,    label: 'Múltiplas carteiras e contas' },
+]
 
 export function FreeDashboard({ showSuccessBanner }: Props) {
   const { transactions } = useTransactions()
@@ -82,60 +89,98 @@ export function FreeDashboard({ showSuccessBanner }: Props) {
       </div>
 
       <div className="space-y-4">
-        {/* Balance hero */}
-        <BalanceHero summary={{ totalIncome, totalExpense, balance, savingsRate }} />
+        {/* Main 2-column layout on large screens */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          {/* LEFT — balance + summary */}
+          <div className="space-y-3">
+            <BalanceHero summary={{ totalIncome, totalExpense, balance, savingsRate }} />
 
-        {/* Simple income/expense summary row */}
-        <div className="grid grid-cols-2 gap-3">
-          <Card>
-            <CardBody className="p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-success/15">
-                  <ArrowUpCircle className="h-4 w-4 text-accent" />
-                </div>
-                <p className="text-xs font-medium text-muted-foreground">{t('dashboard.income')}</p>
-              </div>
-              <p className="text-lg font-extrabold text-accent">{formatCurrency(totalIncome)}</p>
-            </CardBody>
-          </Card>
-          <Card>
-            <CardBody className="p-4">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-danger/15">
-                  <ArrowDownCircle className="h-4 w-4 text-danger" />
-                </div>
-                <p className="text-xs font-medium text-muted-foreground">{t('dashboard.expenses')}</p>
-              </div>
-              <p className="text-lg font-extrabold text-danger">{formatCurrency(totalExpense)}</p>
-            </CardBody>
-          </Card>
+            <div className="grid grid-cols-2 gap-3">
+              <Card>
+                <CardBody className="p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-success/15">
+                      <ArrowUpCircle className="h-4 w-4 text-accent" />
+                    </div>
+                    <p className="text-xs font-medium text-muted-foreground">{t('dashboard.income')}</p>
+                  </div>
+                  <p className="text-lg font-extrabold text-accent">{formatCurrency(totalIncome)}</p>
+                </CardBody>
+              </Card>
+              <Card>
+                <CardBody className="p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-danger/15">
+                      <ArrowDownCircle className="h-4 w-4 text-danger" />
+                    </div>
+                    <p className="text-xs font-medium text-muted-foreground">{t('dashboard.expenses')}</p>
+                  </div>
+                  <p className="text-lg font-extrabold text-danger">{formatCurrency(totalExpense)}</p>
+                </CardBody>
+              </Card>
+            </div>
+          </div>
+
+          {/* RIGHT — chart + recent transactions */}
+          <div className="space-y-3">
+            {categoryTotals.length > 0 && (
+              <Card>
+                <CardBody className="p-4">
+                  <p className="mb-3 text-sm font-semibold text-foreground">{t('dashboard.expenses_by_category')}</p>
+                  <ExpensePieChart data={categoryTotals} />
+                </CardBody>
+              </Card>
+            )}
+            <RecentTransactions transactions={periodTx} />
+          </div>
         </div>
 
-        {/* Expense pie chart */}
-        {categoryTotals.length > 0 && (
-          <Card>
-            <CardBody className="p-4">
-              <p className="mb-3 text-sm font-semibold text-foreground">{t('dashboard.expenses_by_category')}</p>
-              <ExpensePieChart data={categoryTotals} />
-            </CardBody>
-          </Card>
-        )}
+        {/* Pro upgrade section — prominent, full width */}
+        <div
+          className="overflow-hidden rounded-3xl border border-primary/20"
+          style={{ boxShadow: '0 0 40px 0 rgba(99,102,241,0.12)' }}
+        >
+          {/* Gradient header */}
+          <div className="bg-gradient-primary p-5">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-primary-foreground/20">
+                <Crown className="h-5 w-5 text-primary-foreground" />
+              </div>
+              <div>
+                <p className="text-sm font-bold text-primary-foreground">Moniv Pro</p>
+                <p className="text-xs text-primary-foreground/70">Análise financeira avançada</p>
+              </div>
+              <div className="ml-auto">
+                <span className="rounded-full bg-primary-foreground/20 px-3 py-1 text-xs font-bold text-primary-foreground">
+                  a partir de €6/mês
+                </span>
+              </div>
+            </div>
+          </div>
 
-        {/* Recent transactions */}
-        <RecentTransactions transactions={periodTx} />
+          {/* Content */}
+          <div className="bg-surface p-5">
+            {/* Benefits grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
+              {PRO_BENEFITS.map((b) => (
+                <div key={b.label} className="flex items-center gap-2.5 rounded-xl border border-surface-border bg-surface-elevated px-3 py-2.5">
+                  <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-lg bg-primary/15 text-primary">
+                    {b.icon}
+                  </span>
+                  <p className="text-xs font-medium text-foreground leading-tight">{b.label}</p>
+                </div>
+              ))}
+            </div>
 
-        {/* Pro upgrade teaser */}
-        <Card className="overflow-hidden border-primary/20" style={{ boxShadow: '0 0 28px 0 rgba(99,102,241,0.1)' }}>
-          <CardBody className="p-0">
-            {/* Blurred preview */}
-            <div className="relative overflow-hidden">
+            {/* Blurred chart preview */}
+            <div className="relative overflow-hidden rounded-2xl border border-surface-border mb-4">
               <div className="pointer-events-none flex h-28 select-none items-end justify-around gap-1 px-4 pt-4 opacity-20 blur-sm">
-                {[40, 80, 55, 100, 60, 120, 70, 90, 45, 110, 65, 95].map((h, i) => (
+                {[40, 80, 55, 100, 60, 120, 70, 90, 45, 110, 65, 95].map((bh, i) => (
                   <div
                     key={i}
                     className="flex-1 rounded-t-md"
                     style={{
-                      height: `${h * 0.75}px`,
+                      height: `${bh * 0.75}px`,
                       background: i % 2 === 0
                         ? 'linear-gradient(to top, #10b981, #34d399)'
                         : 'linear-gradient(to top, #6366f1, #818cf8)',
@@ -143,30 +188,30 @@ export function FreeDashboard({ showSuccessBanner }: Props) {
                   />
                 ))}
               </div>
-              {/* Lock overlay */}
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-surface/90 backdrop-blur-sm p-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-primary shadow-glow-primary">
-                  <Lock className="h-4.5 w-4.5 text-primary-foreground" />
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-surface/90 backdrop-blur-sm p-4">
+                <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-gradient-primary shadow-glow-primary">
+                  <Lock className="h-4 w-4 text-primary-foreground" />
                 </div>
-                <div className="text-center">
-                  <p className="text-sm font-bold text-foreground">Análise avançada</p>
-                  <p className="mt-0.5 text-xs text-muted-foreground">
-                    Gráficos de tendências, breakdown e evolução mensal
-                  </p>
-                </div>
-                <Button
-                  variant="primary"
-                  size="sm"
-                  onClick={() => openModal('upgrade')}
-                  className="gap-1.5 text-xs shadow-glow-primary"
-                >
-                  <Crown className="h-3.5 w-3.5" />
-                  Upgrade para Pro — €6/mês
-                </Button>
+                <p className="text-xs font-semibold text-muted-foreground">Gráficos de tendência e evolução bloqueados</p>
               </div>
             </div>
-          </CardBody>
-        </Card>
+
+            {/* CTA */}
+            <Button
+              variant="primary"
+              fullWidth
+              size="lg"
+              onClick={() => openModal('upgrade')}
+              className="gap-2 shadow-glow-primary"
+            >
+              <Crown className="h-4 w-4" />
+              Fazer Upgrade para Pro
+            </Button>
+            <p className="mt-2 text-center text-[11px] text-muted-foreground">
+              Cancele a qualquer momento · Sem contratos
+            </p>
+          </div>
+        </div>
 
         {/* Empty state */}
         {periodTx.length === 0 && (
