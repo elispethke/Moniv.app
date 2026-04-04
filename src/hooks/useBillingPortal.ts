@@ -10,8 +10,12 @@ export function useBillingPortal() {
     setError(null)
 
     try {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) throw new Error('Not authenticated')
+      // Refresh the session first to ensure access_token is not expired
+      const { data: refreshed, error: refreshError } = await supabase.auth.refreshSession()
+      const session = refreshed?.session ?? (
+        refreshError ? null : (await supabase.auth.getSession()).data.session
+      )
+      if (!session) throw new Error('Session expired — please log in again.')
 
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string
       const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string

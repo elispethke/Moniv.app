@@ -99,13 +99,13 @@ describe('snapshot data: period filtering', () => {
 
   it('filterByPeriod("this_month") keeps only current-month transactions', () => {
     vi.setSystemTime(new Date('2024-06-20'))
-    const filtered = filterByPeriod(all, 'this_month')
+    const filtered = filterByPeriod(all, 'this-month')
     expect(filtered.some((t) => t.date === '2024-06-15')).toBe(true)
     expect(filtered.some((t) => t.date === '2024-05-10')).toBe(false)
   })
 
   it('filterByPeriod("all_time") returns all transactions', () => {
-    const filtered = filterByPeriod(all, 'all_time')
+    const filtered = filterByPeriod(all, 'all-time')
     expect(filtered).toHaveLength(2)
   })
 

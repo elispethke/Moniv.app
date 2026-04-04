@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from 'react-router-dom'
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { LandingPage } from '@/features/landing/LandingPage'
 import { EntryScreen } from '@/features/entry/EntryScreen'
 import { OnboardingPage } from '@/features/onboarding/OnboardingPage'
@@ -20,6 +20,17 @@ import { AdminRoute } from '@/components/auth/AdminRoute'
 import { AdminPage } from '@/features/admin/AdminPage'
 import { Navbar } from '@/components/layout/Navbar'
 import { BottomNav } from '@/components/layout/BottomNav'
+
+/** Captures ?ref= param, writes to localStorage, then redirects to /signup */
+function InviteRedirect() {
+  const { search } = useLocation()
+  const params = new URLSearchParams(search)
+  const ref = params.get('ref')
+  if (ref) {
+    try { localStorage.setItem('referral_ref', ref) } catch { /* ignore */ }
+  }
+  return <Navigate to={ref ? `/signup?ref=${ref}` : '/signup'} replace />
+}
 
 function AppShell() {
   return (
@@ -60,6 +71,9 @@ export function AppRouter() {
       </Route>
 
       <Route path="/reset-password" element={<ResetPasswordPage />} />
+
+      {/* Referral invite link — captures ?ref= and redirects to /signup */}
+      <Route path="/invite" element={<InviteRedirect />} />
 
       <Route element={<ProtectedRoute />}>
         <Route path="/onboarding" element={<OnboardingPage />} />

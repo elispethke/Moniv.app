@@ -18,36 +18,25 @@ const fromMock = supabase.from as ReturnType<typeof vi.fn>
 
 // ── Mock builders ─────────────────────────────────────────────────────────────
 
-function mockRateLimitOk() {
-  rpcMock.mockResolvedValue({ data: true, error: null })
+/** rpc() call sequence: rate-limit → award */
+function mockRpc(rateLimitData: boolean | null, rateLimitErr: null | { message: string } = null) {
+  rpcMock
+    .mockResolvedValueOnce({ data: rateLimitData, error: rateLimitErr }) // check_referral_rate_limit
+    .mockResolvedValueOnce({ error: null })                              // award_referral_pro
 }
 
-function mockRateLimitExceeded() {
-  rpcMock.mockResolvedValue({ data: false, error: null })
+function mockInsertOk() {
+  fromMock.mockReturnValue({ insert: vi.fn().mockResolvedValue({ error: null }) })
 }
 
-function mockRateLimitError() {
-  rpcMock.mockResolvedValue({ data: null, error: { message: 'rpc error' } })
-}
-
-function mockInsertSuccess() {
-  fromMock.mockReturnValue({
-    insert: vi.fn().mockResolvedValue({ error: null }),
-  })
-}
-
-function mockInsertFailure(message: string) {
-  fromMock.mockReturnValue({
-    insert: vi.fn().mockResolvedValue({ error: { message } }),
-  })
+function mockInsertFail(message: string) {
+  fromMock.mockReturnValue({ insert: vi.fn().mockResolvedValue({ error: { message } }) })
 }
 
 function mockCount(count: number | null, error: { message: string } | null = null) {
-  // Chain: supabase.from().select().eq().eq() → { count, error }
   const eqInner = vi.fn().mockResolvedValue({ count, error })
   const eqOuter = vi.fn().mockReturnValue({ eq: eqInner })
-  const select  = vi.fn().mockReturnValue({ eq: eqOuter })
-  fromMock.mockReturnValue({ select })
+  fromMock.mockReturnValue({ select: vi.fn().mockReturnValue({ eq: eqOuter }) })
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -60,20 +49,23 @@ describe('referralService.recordReferral', () => {
     vi.spyOn(console, 'error').mockImplementation(() => {})
   })
 
-  it('inserts a completed referral when all checks pass', async () => {
-    mockRateLimitOk()
-    mockInsertSuccess()
+  it('inserts and rewards on the happy path', async () => {
+    mockRpc(true)
+    mockInsertOk()
 
     await referralService.recordReferral('referrer-1', 'referred-1')
 
-    expect(rpcMock).toHaveBeenCalledWith('check_referral_rate_limit', {
+    expect(rpcMock).toHaveBeenNthCalledWith(1, 'check_referral_rate_limit', {
       p_referrer_id: 'referrer-1',
     })
     expect(fromMock).toHaveBeenCalledWith('referrals')
+    expect(rpcMock).toHaveBeenNthCalledWith(2, 'award_referral_pro', {
+      p_referrer_id: 'referrer-1',
+    })
   })
 
-  it('inserts with status "completed" so the DB trigger fires immediately', async () => {
-    mockRateLimitOk()
+  it('inserts with status "completed"', async () => {
+    mockRpc(true)
     const insertMock = vi.fn().mockResolvedValue({ error: null })
     fromMock.mockReturnValue({ insert: insertMock })
 
@@ -88,29 +80,27 @@ describe('referralService.recordReferral', () => {
     )
   })
 
-  it('blocks self-referral without touching the DB', async () => {
-    await referralService.recordReferral('same-id', 'same-id')
+  it('blocks self-referral without any DB call', async () => {
+    await referralService.recordReferral('same', 'same')
 
     expect(rpcMock).not.toHaveBeenCalled()
     expect(fromMock).not.toHaveBeenCalled()
     expect(console.warn).toHaveBeenCalledWith('[referral] Self-referral blocked')
   })
 
-  it('aborts when rate limit is exceeded', async () => {
-    mockRateLimitExceeded()
+  it('aborts when daily limit exceeded', async () => {
+    mockRpc(false)
 
-    await referralService.recordReferral('referrer-1', 'referred-1')
+    await referralService.recordReferral('r1', 'r2')
 
     expect(fromMock).not.toHaveBeenCalled()
-    expect(console.warn).toHaveBeenCalledWith(
-      '[referral] Referrer exceeded daily limit — skipping',
-    )
+    expect(console.warn).toHaveBeenCalledWith('[referral] Daily limit exceeded — skipping')
   })
 
-  it('aborts gracefully when the rate-limit RPC fails', async () => {
-    mockRateLimitError()
+  it('aborts when rate-limit RPC fails', async () => {
+    rpcMock.mockResolvedValueOnce({ data: null, error: { message: 'rpc error' } })
 
-    await referralService.recordReferral('referrer-1', 'referred-1')
+    await referralService.recordReferral('r1', 'r2')
 
     expect(fromMock).not.toHaveBeenCalled()
     expect(console.error).toHaveBeenCalledWith(
@@ -119,18 +109,24 @@ describe('referralService.recordReferral', () => {
     )
   })
 
-  it('logs error but does not throw when the DB insert fails', async () => {
-    mockRateLimitOk()
-    mockInsertFailure('duplicate key')
+  it('returns without throwing when insert fails', async () => {
+    mockRpc(true)
+    mockInsertFail('duplicate key')
 
-    await expect(
-      referralService.recordReferral('referrer-1', 'referred-1'),
-    ).resolves.toBeUndefined()
+    await expect(referralService.recordReferral('r1', 'r2')).resolves.toBeUndefined()
+    expect(console.error).toHaveBeenCalledWith('[referral] Insert failed:', 'duplicate key')
+    // Award RPC should NOT be called if insert failed
+    expect(rpcMock).toHaveBeenCalledTimes(1) // only rate-limit, not award
+  })
 
-    expect(console.error).toHaveBeenCalledWith(
-      '[referral] Failed to record referral:',
-      'duplicate key',
-    )
+  it('logs reward failure but does not throw', async () => {
+    mockRpc(true)
+    mockInsertOk()
+    // Override the award_referral_pro call to fail
+    rpcMock.mockResolvedValueOnce({ error: { message: 'reward failed' } })
+
+    await expect(referralService.recordReferral('r1', 'r2')).resolves.toBeUndefined()
+    expect(console.error).toHaveBeenCalledWith('[referral] Reward RPC failed:', 'reward failed')
   })
 })
 
@@ -139,27 +135,26 @@ describe('referralService.recordReferral', () => {
 describe('referralService.getReferralCount', () => {
   beforeEach(() => {
     fromMock.mockReset()
-    vi.spyOn(console, 'error').mockImplementation(() => {})
   })
 
-  it('returns the DB count', async () => {
-    mockCount(3)
-    expect(await referralService.getReferralCount('user-1')).toBe(3)
+  it('returns the count from DB', async () => {
+    mockCount(7)
+    expect(await referralService.getReferralCount('u1')).toBe(7)
   })
 
   it('returns 0 when count is null', async () => {
     mockCount(null)
-    expect(await referralService.getReferralCount('user-1')).toBe(0)
+    expect(await referralService.getReferralCount('u1')).toBe(0)
   })
 
   it('returns 0 on DB error', async () => {
     mockCount(null, { message: 'db error' })
-    expect(await referralService.getReferralCount('user-err')).toBe(0)
+    expect(await referralService.getReferralCount('u1')).toBe(0)
   })
 
-  it('returns 0 when the user has no referrals', async () => {
+  it('returns 0 when user has no referrals', async () => {
     mockCount(0)
-    expect(await referralService.getReferralCount('user-no-refs')).toBe(0)
+    expect(await referralService.getReferralCount('u-none')).toBe(0)
   })
 })
 
@@ -172,51 +167,49 @@ describe('anti-fraud: self-referral edge cases', () => {
     vi.spyOn(console, 'warn').mockImplementation(() => {})
   })
 
-  it('blocks when referrerId === referredUserId (UUID format)', async () => {
+  it('blocks identical UUID referrals', async () => {
     const id = 'a1b2c3d4-e5f6-7890-abcd-ef1234567890'
     await referralService.recordReferral(id, id)
     expect(rpcMock).not.toHaveBeenCalled()
-    expect(fromMock).not.toHaveBeenCalled()
   })
 
-  it('proceeds when IDs are different', async () => {
-    rpcMock.mockResolvedValue({ data: true, error: null })
-    const insertMock = vi.fn().mockResolvedValue({ error: null })
-    fromMock.mockReturnValue({ insert: insertMock })
+  it('allows different UUIDs', async () => {
+    rpcMock
+      .mockResolvedValueOnce({ data: true, error: null })
+      .mockResolvedValueOnce({ error: null })
+    fromMock.mockReturnValue({ insert: vi.fn().mockResolvedValue({ error: null }) })
 
     await referralService.recordReferral('id-a', 'id-b')
-
-    expect(rpcMock).toHaveBeenCalledTimes(1)
-    expect(insertMock).toHaveBeenCalledTimes(1)
+    expect(rpcMock).toHaveBeenCalledTimes(2) // rate-limit + award
   })
 })
 
 // ─────────────────────────────────────────────────────────────────────────────
 
-describe('anti-fraud: daily rate limit', () => {
+describe('anti-fraud: rate limit', () => {
   beforeEach(() => {
     rpcMock.mockReset()
     fromMock.mockReset()
     vi.spyOn(console, 'warn').mockImplementation(() => {})
-    vi.spyOn(console, 'error').mockImplementation(() => {})
   })
 
-  it('calls the rate-limit RPC with the correct referrer ID', async () => {
-    rpcMock.mockResolvedValue({ data: true, error: null })
+  it('passes the correct referrer ID to the rate-limit RPC', async () => {
+    rpcMock
+      .mockResolvedValueOnce({ data: true, error: null })
+      .mockResolvedValueOnce({ error: null })
     fromMock.mockReturnValue({ insert: vi.fn().mockResolvedValue({ error: null }) })
 
-    await referralService.recordReferral('the-referrer', 'the-referred')
+    await referralService.recordReferral('the-ref', 'the-new')
 
-    expect(rpcMock).toHaveBeenCalledWith('check_referral_rate_limit', {
-      p_referrer_id: 'the-referrer',
+    expect(rpcMock).toHaveBeenNthCalledWith(1, 'check_referral_rate_limit', {
+      p_referrer_id: 'the-ref',
     })
   })
 
-  it('stops before insert when rate limit returns false', async () => {
-    rpcMock.mockResolvedValue({ data: false, error: null })
+  it('stops before insert when limit returns false', async () => {
+    rpcMock.mockResolvedValueOnce({ data: false, error: null })
 
-    await referralService.recordReferral('referrer', 'referred')
-
+    await referralService.recordReferral('ref', 'new')
     expect(fromMock).not.toHaveBeenCalled()
   })
 })

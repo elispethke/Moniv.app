@@ -22,8 +22,12 @@ export function useSignupForm() {
   const { t } = useTranslation()
   const [searchParams] = useSearchParams()
 
-  // Capture referrer ID from URL (?ref=USER_ID)
-  const referrerId = searchParams.get('ref') ?? null
+  // Capture referrer ID: URL param first, then localStorage backup
+  const referrerId = (() => {
+    const fromUrl = searchParams.get('ref')
+    if (fromUrl) return fromUrl
+    try { return localStorage.getItem('referral_ref') } catch { return null }
+  })()
 
   const [fields, setFields] = useState<SignupFields>({
     fullName: '',
@@ -70,7 +74,10 @@ export function useSignupForm() {
         // Fire-and-forget — don't block signup on referral errors
         referralService
           .recordReferral(referrerId, newUser.id)
-          .then(() => analytics.referralRecorded(true))
+          .then(() => {
+            analytics.referralRecorded(true)
+            try { localStorage.removeItem('referral_ref') } catch { /* ignore */ }
+          })
           .catch(() => analytics.referralRecorded(false))
       }
 

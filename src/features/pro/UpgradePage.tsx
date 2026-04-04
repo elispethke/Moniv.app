@@ -46,7 +46,7 @@ export function UpgradePage() {
 
   return (
     <PageLayout title="" subtitle="">
-      <div className="space-y-6 pb-8">
+      <div className="mx-auto max-w-2xl space-y-6 pb-8">
         {/* Back */}
         <button
           onClick={() => navigate(-1)}
