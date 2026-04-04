@@ -107,4 +107,18 @@
   .gradient-text {
     @apply bg-gradient-primary bg-clip-text text-transparent;
   }
+
+  .gradient-text-animated {
+    background: linear-gradient(
+      90deg,
+      rgb(var(--primary)) 0%,
+      rgb(var(--secondary)) 40%,
+      rgb(var(--primary)) 80%
+    );
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: shimmer 3s linear infinite;
+  }
 }

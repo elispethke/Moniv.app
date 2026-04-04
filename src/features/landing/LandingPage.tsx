@@ -2,7 +2,7 @@ import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import {
   BarChart2, Shield, Zap, TrendingUp, Target,
   CreditCard, ArrowRight, Crown, ArrowUpRight, ArrowDownLeft,
-  Check,
+  Check, FileDown, Brain,
 } from 'lucide-react'
 import { useAuthStore } from '@/store/useAuthStore'
 import { useTranslation } from '@/hooks/useTranslation'
@@ -280,6 +280,93 @@ function AppPreview() {
   )
 }
 
+// ── Pro analytics mock (right panel of Pro section) ──────────────────────────
+function ProAnalyticsMock() {
+  const bars = [
+    { label: 'Jan', income: 65, expense: 42 },
+    { label: 'Fev', income: 78, expense: 55 },
+    { label: 'Mar', income: 60, expense: 38 },
+    { label: 'Abr', income: 90, expense: 61 },
+    { label: 'Mai', income: 85, expense: 48 },
+    { label: 'Jun', income: 100, expense: 52 },
+  ]
+
+  return (
+    <div className="relative w-full max-w-sm lg:max-w-none">
+      <div className="absolute -inset-4 rounded-[2rem] bg-gradient-to-br from-primary/15 via-secondary/8 to-accent/8 blur-2xl" />
+      <div className="relative rounded-3xl border border-surface-border bg-surface/90 backdrop-blur-xl shadow-2xl overflow-hidden">
+        {/* PDF Header */}
+        <div className="bg-gradient-to-r from-primary to-secondary px-5 py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-primary-foreground/70">Relatório PDF</p>
+              <p className="text-sm font-bold text-primary-foreground">Junho 2024</p>
+            </div>
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary-foreground/20">
+              <FileDown className="h-4 w-4 text-primary-foreground" />
+            </div>
+          </div>
+          <div className="mt-3 grid grid-cols-3 gap-2">
+            <div className="rounded-lg bg-primary-foreground/10 px-2 py-1.5 text-center">
+              <p className="text-[9px] text-primary-foreground/60 uppercase">Receita</p>
+              <p className="text-xs font-bold text-primary-foreground">€3.450</p>
+            </div>
+            <div className="rounded-lg bg-primary-foreground/10 px-2 py-1.5 text-center">
+              <p className="text-[9px] text-primary-foreground/60 uppercase">Despesa</p>
+              <p className="text-xs font-bold text-primary-foreground">€1.790</p>
+            </div>
+            <div className="rounded-lg bg-primary-foreground/10 px-2 py-1.5 text-center">
+              <p className="text-[9px] text-primary-foreground/60 uppercase">Poupança</p>
+              <p className="text-xs font-bold text-accent-light">48%</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Bar chart */}
+        <div className="px-4 pt-4 pb-3">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Evolução Mensal</p>
+            <div className="flex items-center gap-2">
+              <span className="flex items-center gap-1 text-[9px] text-accent"><span className="h-1.5 w-2.5 rounded-full bg-accent inline-block" /> Receita</span>
+              <span className="flex items-center gap-1 text-[9px] text-danger"><span className="h-1.5 w-2.5 rounded-full bg-danger inline-block" /> Despesa</span>
+            </div>
+          </div>
+          <div className="flex items-end gap-1.5 h-20">
+            {bars.map((b) => (
+              <div key={b.label} className="flex-1 flex items-end gap-0.5">
+                <div className="flex-1 rounded-t bg-accent/70 transition-all" style={{ height: `${b.income * 0.8}%` }} />
+                <div className="flex-1 rounded-t bg-danger/60 transition-all" style={{ height: `${b.expense * 0.8}%` }} />
+              </div>
+            ))}
+          </div>
+          <div className="flex justify-between mt-1 px-0.5">
+            {bars.map((b) => <span key={b.label} className="flex-1 text-center text-[8px] text-muted-foreground">{b.label}</span>)}
+          </div>
+        </div>
+
+        {/* AI insight strip */}
+        <div className="border-t border-surface-border/60 px-4 py-3 bg-primary/5">
+          <div className="flex items-center gap-2">
+            <Brain className="h-3.5 w-3.5 text-primary flex-shrink-0" />
+            <p className="text-[10px] font-semibold text-foreground">
+              Você poupou <span className="text-accent">€1.660</span> este mês — acima da média em 18%
+            </p>
+          </div>
+        </div>
+
+        {/* Pro footer */}
+        <div className="border-t border-surface-border px-4 py-2.5 flex items-center justify-between bg-surface-elevated/60">
+          <div className="flex items-center gap-1.5">
+            <Crown className="h-3 w-3 text-primary" />
+            <span className="text-[10px] font-bold text-primary">Moniv Pro</span>
+          </div>
+          <span className="text-[9px] text-muted-foreground">Acesso completo ativo</span>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ── Landing Page ───────────────────────────────────────────────────────────────
 export function LandingPage() {
   const { isAuthenticated, isInitialized } = useAuthStore()
@@ -357,11 +444,10 @@ export function LandingPage() {
 
             {/* Headline */}
             <h1 className="text-[2.5rem] sm:text-5xl lg:text-6xl font-extrabold leading-[1.05] tracking-tight text-foreground">
-              {t('landing.hero_title_1')}<br className="hidden sm:block" />{' '}
+              <span className="gradient-text-animated">{t('landing.hero_title_1')}</span>
+              <br className="hidden sm:block" />{' '}
               {t('landing.hero_title_2')}{' '}
-              <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                {t('landing.hero_title_accent')}
-              </span>
+              {t('landing.hero_title_accent')}
             </h1>
 
             <p className="mt-5 text-base lg:text-lg leading-relaxed text-muted-foreground max-w-md">
@@ -399,6 +485,87 @@ export function LandingPage() {
           {/* Right — app preview */}
           <div className="w-full max-w-xs sm:max-w-sm lg:flex-1 lg:max-w-lg xl:max-w-xl">
             <AppPreview />
+          </div>
+        </div>
+      </section>
+
+      {/* ── Pro section ──────────────────────────────────────────────────── */}
+      <section className="relative z-10 w-full px-6 lg:px-16 xl:px-24 pb-20 lg:pb-28">
+        <div
+          className="rounded-3xl border border-primary/20 overflow-hidden"
+          style={{ boxShadow: '0 0 60px 0 rgba(99,102,241,0.1)' }}
+        >
+          <div className="grid grid-cols-1 lg:grid-cols-2">
+            {/* LEFT — copy */}
+            <div className="p-8 lg:p-12 bg-gradient-to-br from-primary/8 via-surface to-surface">
+              {/* Badge */}
+              <div className="mb-5 inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/10 px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest text-primary">
+                <Crown className="h-3 w-3" />
+                Moniv Pro
+              </div>
+
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight mb-3">
+                Controle total das suas finanças
+              </h2>
+              <p className="text-sm text-muted-foreground leading-relaxed mb-6">
+                Melhores insights, decisões mais inteligentes e visibilidade total do seu patrimônio —
+                tudo num único painel.
+              </p>
+
+              {/* Features */}
+              <ul className="space-y-2.5 mb-6">
+                {[
+                  { icon: <BarChart2 className="h-3.5 w-3.5" />, text: 'Análises avançadas e gráficos de evolução' },
+                  { icon: <Target className="h-3.5 w-3.5" />, text: 'Metas e orçamentos com progresso automático' },
+                  { icon: <CreditCard className="h-3.5 w-3.5" />, text: 'Parcelamentos e recorrências controlados' },
+                  { icon: <Brain className="h-3.5 w-3.5" />, text: 'Insights inteligentes sobre seus hábitos (em breve)' },
+                ].map(({ icon, text }) => (
+                  <li key={text} className="flex items-start gap-2.5">
+                    <span className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-lg bg-primary/15 text-primary">
+                      {icon}
+                    </span>
+                    <span className="text-xs text-foreground leading-relaxed">{text}</span>
+                  </li>
+                ))}
+              </ul>
+
+              {/* PDF highlight */}
+              <div className="mb-6 rounded-xl border border-accent/25 bg-accent/8 p-3.5">
+                <div className="flex items-center gap-2 mb-1">
+                  <FileDown className="h-4 w-4 text-accent flex-shrink-0" />
+                  <p className="text-xs font-bold text-foreground">Exporte seus dados como PDF profissional</p>
+                </div>
+                <p className="text-[11px] text-muted-foreground leading-relaxed">
+                  Relatórios completos com gráficos, categorias e resumo financeiro do período.
+                  Ideal para acompanhar seu progresso ou partilhar com um consultor.
+                </p>
+              </div>
+
+              {/* CTAs */}
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button
+                  onClick={() => navigate('/signup')}
+                  className="flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-primary to-secondary px-6 py-3.5 text-sm font-bold text-primary-foreground shadow-glow-primary transition-all hover:opacity-90 active:scale-[0.98]"
+                >
+                  <Crown className="h-4 w-4" />
+                  Assinar Pro — €6/mês
+                </button>
+                <button
+                  onClick={() => navigate('/signup')}
+                  className="flex items-center justify-center rounded-2xl border border-surface-border bg-surface/60 px-6 py-3.5 text-sm font-semibold text-foreground backdrop-blur-sm transition-all hover:bg-surface-elevated active:scale-[0.98]"
+                >
+                  Começar grátis
+                </button>
+              </div>
+              <p className="mt-2.5 text-[11px] text-muted-foreground">
+                {t('landing.social_proof')}
+              </p>
+            </div>
+
+            {/* RIGHT — visual */}
+            <div className="flex items-center justify-center p-6 lg:p-10 bg-gradient-to-bl from-primary/6 to-transparent border-t lg:border-t-0 lg:border-l border-primary/15">
+              <ProAnalyticsMock />
+            </div>
           </div>
         </div>
       </section>
