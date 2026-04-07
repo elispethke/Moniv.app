@@ -1,4 +1,4 @@
-import { ArrowUpCircle, ArrowDownCircle, Sparkles, Crown, FileDown, TrendingUp, TrendingDown, Minus, Share2 } from 'lucide-react'
+import { ArrowUpCircle, ArrowDownCircle, Sparkles, Crown, FileDown, TrendingUp, TrendingDown, Minus, Share2, Brain, AlertTriangle, Zap } from 'lucide-react'
 import { PageLayout } from '@/components/layout/PageLayout'
 import { BalanceHero } from './BalanceHero'
 import { RecentTransactions } from './RecentTransactions'
@@ -7,6 +7,8 @@ import { MonthlyBarChart } from '@/components/charts/MonthlyBarChart'
 import { TrendLineChart } from '@/components/charts/TrendLineChart'
 import { CategoryBreakdown } from '@/components/charts/CategoryBreakdown'
 import { SparklineCard } from '@/components/charts/SparklineCard'
+import { BalanceLineChart } from '@/components/charts/BalanceLineChart'
+import { DailySpendingChart } from '@/components/charts/DailySpendingChart'
 import { PeriodSelector } from '@/components/ui/PeriodSelector'
 import { Card, CardBody } from '@/components/ui/Card'
 import { useTransactions } from '@/hooks/useTransactions'
@@ -17,7 +19,7 @@ import { usePeriodStore } from '@/store/usePeriodStore'
 import { useAuthStore } from '@/store/useAuthStore'
 import { useTranslation } from '@/hooks/useTranslation'
 import { toUserProfile } from '@/types/user'
-import { filterByPeriod, calculateCategoryTotals, getMonthlyData } from '@/utils/calculations'
+import { filterByPeriod, calculateCategoryTotals, getMonthlyData, getBalanceHistory } from '@/utils/calculations'
 import type { Transaction } from '@/types/transaction'
 import { cn } from '@/utils/cn'
 
@@ -108,6 +110,43 @@ function ChartSection({
   )
 }
 
+// ── Narrative insight block ────────────────────────────────────────────────────
+function NarrativeInsight({
+  icon,
+  text,
+  sub,
+  variant = 'default',
+}: {
+  icon: React.ReactNode
+  text: React.ReactNode
+  sub?: string
+  variant?: 'default' | 'positive' | 'warning'
+}) {
+  const cardCls = {
+    default: 'border-surface-border bg-surface',
+    positive: 'border-accent/20 bg-accent/5',
+    warning:  'border-warning/20 bg-warning/5',
+  }[variant]
+  const iconCls = {
+    default: 'bg-primary/15 text-primary',
+    positive: 'bg-accent/15 text-accent',
+    warning:  'bg-warning/15 text-warning',
+  }[variant]
+  return (
+    <div className={cn('rounded-2xl border p-4', cardCls)}>
+      <div className="flex items-start gap-3">
+        <div className={cn('flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl', iconCls)}>
+          {icon}
+        </div>
+        <div className="min-w-0">
+          <p className="text-xs font-semibold leading-snug text-foreground">{text}</p>
+          {sub && <p className="mt-1 text-[11px] text-muted-foreground">{sub}</p>}
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ── Pro Dashboard ──────────────────────────────────────────────────────────────
 export function ProDashboard({ showSuccessBanner }: Props) {
   const { transactions } = useTransactions()
@@ -153,6 +192,14 @@ export function ProDashboard({ showSuccessBanner }: Props) {
 
   // ── Biggest expense category ────────────────────────────────────────────────
   const topCategory = categoryTotals[0]
+
+  // ── Extended metrics ────────────────────────────────────────────────────────
+  const balanceHistory  = getBalanceHistory(periodTx)
+  const expenseDays     = new Set(periodTx.filter((t) => t.type === 'expense').map((t) => t.date)).size
+  const avgDailySpend   = expenseDays > 0 ? totalExpense / expenseDays : 0
+  const topTransaction  = [...periodTx]
+    .filter((t) => t.type === 'expense')
+    .sort((a, b) => b.amount - a.amount)[0]
 
   // ── Period label for PDF ────────────────────────────────────────────────────
   const MONTH_NAMES_PT = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
@@ -387,6 +434,128 @@ export function ProDashboard({ showSuccessBanner }: Props) {
           >
             <MonthlyBarChart data={monthlyData} />
           </ChartSection>
+        )}
+
+        {/* Row 4: Balance history + Daily spending — 2-col grid */}
+        {(balanceHistory.length >= 2 || periodTx.filter((t) => t.type === 'expense').length >= 2) && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {balanceHistory.length >= 2 && (
+              <ChartSection
+                title={t('dashboard.balance_over_time')}
+                sub="Evolução acumulada do saldo"
+                glow
+              >
+                <BalanceLineChart data={balanceHistory} />
+              </ChartSection>
+            )}
+            {periodTx.filter((t) => t.type === 'expense').length >= 2 && (
+              <ChartSection
+                title="Padrão de Gastos Diários"
+                sub="Pico e distribuição temporal das despesas"
+              >
+                <DailySpendingChart transactions={periodTx} />
+              </ChartSection>
+            )}
+          </div>
+        )}
+
+        {/* Row 5: Extended KPI grid — 2-col → 4-col at xl */}
+        {periodTx.length > 0 && (
+          <div>
+            <p className="mb-2 text-xs font-bold uppercase tracking-widest text-muted-foreground">
+              Métricas do período
+            </p>
+            <div className="grid grid-cols-2 xl:grid-cols-4 gap-2.5">
+              <InsightCard
+                label="Gasto médio/dia"
+                value={formatCurrency(avgDailySpend)}
+                trend={null}
+                accent="border-secondary/20 bg-secondary/5"
+              />
+              <InsightCard
+                label="Saldo do período"
+                value={formatCurrency(balance)}
+                trend={null}
+                accent={balance >= 0 ? 'border-accent/20 bg-accent/5' : 'border-danger/20 bg-danger/5'}
+              />
+              <InsightCard
+                label="Transações"
+                value={String(periodTx.length)}
+                trend={null}
+                accent="border-surface-border bg-surface"
+              />
+              <InsightCard
+                label="Categorias"
+                value={String(categoryTotals.length)}
+                trend={null}
+                accent="border-surface-border bg-surface"
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Row 6: Narrative insight blocks — 1→2→3 cols */}
+        {periodTx.length > 0 && (
+          <div>
+            <p className="mb-2 text-xs font-bold uppercase tracking-widest text-muted-foreground">
+              Análise inteligente
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+              {savingsRate >= 20 && (
+                <NarrativeInsight
+                  icon={<Sparkles className="h-4 w-4" />}
+                  text={`Taxa de poupança de ${formatPercentage(savingsRate, 0)} — acima dos 20% recomendados`}
+                  sub="Excelente disciplina financeira"
+                  variant="positive"
+                />
+              )}
+              {savingsRate > 0 && savingsRate < 20 && (
+                <NarrativeInsight
+                  icon={<AlertTriangle className="h-4 w-4" />}
+                  text={`Taxa de poupança de ${formatPercentage(savingsRate, 0)} — abaixo dos 20% recomendados`}
+                  sub="Tente reduzir despesas variáveis para atingir a meta"
+                  variant="warning"
+                />
+              )}
+              {topCategory && (
+                <NarrativeInsight
+                  icon={<Brain className="h-4 w-4" />}
+                  text={<>Maior categoria de gasto: <span className="font-bold text-foreground">{t(`categories.${topCategory.category}`)}</span> ({topCategory.percentage.toFixed(0)}%)</>}
+                  sub="Monitorar esta categoria pode ajudar a equilibrar o orçamento"
+                />
+              )}
+              {savingsTrend !== null && savingsTrend > 5 && (
+                <NarrativeInsight
+                  icon={<Zap className="h-4 w-4" />}
+                  text={`Taxa de poupança melhorou ${Math.abs(savingsTrend).toFixed(1)}% vs mês anterior`}
+                  sub="Continue assim — a tendência é positiva"
+                  variant="positive"
+                />
+              )}
+              {savingsTrend !== null && savingsTrend < -5 && (
+                <NarrativeInsight
+                  icon={<AlertTriangle className="h-4 w-4" />}
+                  text={`Taxa de poupança caiu ${Math.abs(savingsTrend).toFixed(1)}% vs mês anterior`}
+                  sub="Atenção: revise as despesas deste mês"
+                  variant="warning"
+                />
+              )}
+              {topTransaction && (
+                <NarrativeInsight
+                  icon={<Brain className="h-4 w-4" />}
+                  text={<>Maior despesa: <span className="font-bold text-foreground">{topTransaction.description}</span> — {formatCurrency(topTransaction.amount)}</>}
+                  sub={t(`categories.${topTransaction.category}`)}
+                />
+              )}
+              {avgDailySpend > 0 && (
+                <NarrativeInsight
+                  icon={<Zap className="h-4 w-4" />}
+                  text={`Gasto médio diário de ${formatCurrency(avgDailySpend)}`}
+                  sub={`Com base em ${expenseDays} dia${expenseDays !== 1 ? 's' : ''} com despesas no período`}
+                />
+              )}
+            </div>
+          </div>
         )}
 
         {/* Recent transactions */}

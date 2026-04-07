@@ -379,6 +379,12 @@
     "plan_yearly": "Yearly",
     "plan_badge": "Best value",
     "plan_savings": "Save €17/year",
-    "footer_copy": "© {{year}} Moniv. All rights reserved."
+    "footer_copy": "© {{year}} Moniv. All rights reserved.",
+    "mindset_line_1": "You don't need to earn more money.",
+    "mindset_line_2": "You need to understand what you do with it.",
+    "mindset_desc": "Moniv turns data into clarity. See exactly where every euro goes — and make decisions with confidence.",
+    "mindset_stat_1": "of users spot unnecessary spending in the first week",
+    "mindset_stat_2": "average savings after 3 months of use",
+    "mindset_stat_3": "satisfaction with financial clarity"
   }
 }

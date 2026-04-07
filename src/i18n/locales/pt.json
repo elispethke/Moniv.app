@@ -379,6 +379,12 @@
     "plan_yearly": "Anual",
     "plan_badge": "Mais vantajoso",
     "plan_savings": "Poupa €17/ano",
-    "footer_copy": "© {{year}} Moniv. Todos os direitos reservados."
+    "footer_copy": "© {{year}} Moniv. Todos os direitos reservados.",
+    "mindset_line_1": "Você não precisa ganhar mais dinheiro.",
+    "mindset_line_2": "Você precisa entender o que faz com ele.",
+    "mindset_desc": "Moniv transforma dados em clareza. Veja exatamente para onde vai cada euro — e tome decisões com confiança.",
+    "mindset_stat_1": "dos utilizadores identificam gastos desnecessários na primeira semana",
+    "mindset_stat_2": "de poupança média em 3 meses de utilização",
+    "mindset_stat_3": "de satisfação com a clareza financeira"
   }
 }

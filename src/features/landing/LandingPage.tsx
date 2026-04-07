@@ -432,7 +432,7 @@ export function LandingPage() {
 
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
       <section className="relative z-10 w-full px-6 lg:px-16 xl:px-24 pt-16 pb-20 lg:pt-24 lg:pb-32">
-        <div className="flex flex-col items-center gap-12 lg:flex-row lg:items-center lg:gap-20 xl:gap-28">
+        <div className="flex flex-col items-center gap-12 lg:flex-row lg:items-center lg:gap-16 xl:items-start">
 
           {/* Left — text content */}
           <div className="flex flex-col items-center text-center lg:items-start lg:text-left lg:flex-1">
@@ -444,7 +444,7 @@ export function LandingPage() {
 
             {/* Headline */}
             <h1 className="text-[2.5rem] sm:text-5xl lg:text-6xl font-extrabold leading-[1.05] tracking-tight text-foreground">
-              <span className="gradient-text-animated">{t('landing.hero_title_1')}</span>
+              <span className="text-primary">{t('landing.hero_title_1')}</span>
               <br className="hidden sm:block" />{' '}
               {t('landing.hero_title_2')}{' '}
               {t('landing.hero_title_accent')}
@@ -485,6 +485,35 @@ export function LandingPage() {
           {/* Right — app preview */}
           <div className="w-full max-w-xs sm:max-w-sm lg:flex-1 lg:max-w-lg xl:max-w-xl">
             <AppPreview />
+          </div>
+        </div>
+      </section>
+
+      {/* ── Mindset section ──────────────────────────────────────────────── */}
+      <section className="relative z-10 w-full px-6 lg:px-16 xl:px-24 pb-20 lg:pb-28">
+        <div className="mx-auto max-w-3xl rounded-3xl border border-surface-border/60 bg-surface/40 p-8 text-center backdrop-blur-sm lg:p-12">
+          <p className="text-2xl font-extrabold leading-snug tracking-tight text-foreground sm:text-3xl lg:text-4xl">
+            {t('landing.mindset_line_1')}
+          </p>
+          <p className="text-2xl font-extrabold leading-snug tracking-tight text-primary sm:text-3xl lg:text-4xl">
+            {t('landing.mindset_line_2')}
+          </p>
+          <p className="mx-auto mt-4 max-w-lg text-sm leading-relaxed text-muted-foreground">
+            {t('landing.mindset_desc')}
+          </p>
+          <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div className="rounded-2xl border border-surface-border bg-surface/60 p-5">
+              <p className="text-3xl font-extrabold text-primary">72%</p>
+              <p className="mt-1 text-xs leading-snug text-muted-foreground">{t('landing.mindset_stat_1')}</p>
+            </div>
+            <div className="rounded-2xl border border-surface-border bg-surface/60 p-5">
+              <p className="text-3xl font-extrabold text-accent">€240</p>
+              <p className="mt-1 text-xs leading-snug text-muted-foreground">{t('landing.mindset_stat_2')}</p>
+            </div>
+            <div className="rounded-2xl border border-surface-border bg-surface/60 p-5">
+              <p className="text-3xl font-extrabold text-secondary">98%</p>
+              <p className="mt-1 text-xs leading-snug text-muted-foreground">{t('landing.mindset_stat_3')}</p>
+            </div>
           </div>
         </div>
       </section>
