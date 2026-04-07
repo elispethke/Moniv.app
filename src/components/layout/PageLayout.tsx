@@ -11,7 +11,7 @@ interface PageLayoutProps {
 
 export function PageLayout({ children, className, title, subtitle, action }: PageLayoutProps) {
   return (
-    <main className={cn('mx-auto max-w-6xl px-4 pb-24 pt-6', className)}>
+    <main className={cn('mx-auto max-w-6xl xl:max-w-7xl px-4 xl:px-6 pb-24 pt-6', className)}>
       {(title || action) && (
         <div className="mb-6 flex items-start justify-between">
           <div>

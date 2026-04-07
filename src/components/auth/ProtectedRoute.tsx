@@ -28,7 +28,7 @@ export function ProtectedRoute() {
   const { pathname } = useLocation()
 
   if (!isInitialized) return <AppLoader />
-  if (!isAuthenticated) return <Navigate to="/entry" replace />
+  if (!isAuthenticated) return <Navigate to="/" replace />
   if (!hasOnboarded && pathname !== '/onboarding') return <Navigate to="/onboarding" replace />
 
   return <Outlet />
