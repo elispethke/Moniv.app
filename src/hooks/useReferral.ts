@@ -38,9 +38,7 @@ export function useReferral() {
   }, [user?.id])
 
   // Gera o link usando o referral_code (e não mais user.id)
-  const referralLink = referralCode
-    ? `${APP_URL}/invite?ref=${referralCode}`
-    : null
+  const referralLink = `${APP_URL}/invite?ref=${referralCode ?? user?.id ?? ''}`
 
   // Captura o parâmetro ?ref= da URL e salva no localStorage
   useEffect(() => {
