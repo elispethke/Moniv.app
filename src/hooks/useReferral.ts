@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { useAuthStore } from '@/store/useAuthStore'
 import { referralService } from '@/services/referralService'
 import { analytics } from '@/utils/analytics'
+import { supabase } from '@/services/supabase' // ✅ CORREÇÃO
 
 const APP_URL = 'https://moniv.app'
 const LS_KEY = 'referral_ref'
@@ -11,37 +12,37 @@ export function useReferral() {
   const [copied, setCopied] = useState(false)
   const [referralCount, setReferralCount] = useState(0)
 
-  // Gera o link de convite com o ID do utilizador como referência
-  
+  // Estado do código de referral vindo do banco
   const [referralCode, setReferralCode] = useState<string | null>(null)
 
-   useEffect(() => {
-      if (!user?.id) return
+  // Busca o referral_code no Supabase
+  useEffect(() => {
+    if (!user?.id) return
 
-  const fetchReferralCode = async () => {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('referral_code')
-      .eq('id', user.id)
-      .single()
+    const fetchReferralCode = async () => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('referral_code')
+        .eq('id', user.id)
+        .single()
 
-    if (error) {
-      console.error('Erro ao buscar referral_code:', error.message)
-      return
+      if (error) {
+        console.error('Erro ao buscar referral_code:', error.message)
+        return
+      }
+
+      setReferralCode(data?.referral_code ?? null)
     }
 
-    setReferralCode(data?.referral_code ?? null)
-  }
+    fetchReferralCode()
+  }, [user?.id])
 
-  fetchReferralCode()
-}, [user?.id])
-
-const referralLink = referralCode
-  ? `${APP_URL}/invite?ref=${referralCode}`
-  : null
+  // Gera o link usando o referral_code (e não mais user.id)
+  const referralLink = referralCode
+    ? `${APP_URL}/invite?ref=${referralCode}`
+    : null
 
   // Captura o parâmetro ?ref= da URL e salva no localStorage
-  // Isso garante que o referral não seja perdido mesmo que o usuário navegue antes de se cadastrar
   useEffect(() => {
     try {
       const params = new URLSearchParams(window.location.search)
@@ -54,13 +55,13 @@ const referralLink = referralCode
     }
   }, [])
 
-  // Busca a quantidade de referrals uma vez por sessão do usuário
+  // Busca a quantidade de referrals
   useEffect(() => {
     if (!user?.id) return
     referralService
       .getReferralCount(user.id)
       .then(setReferralCount)
-      .catch(() => { /* erro não bloqueante */ })
+      .catch(() => {})
   }, [user?.id])
 
   const copyLink = async () => {
@@ -69,7 +70,6 @@ const referralLink = referralCode
     try {
       await navigator.clipboard.writeText(referralLink)
     } catch {
-      // Fallback para navegadores sem suporte à Clipboard API
       const el = document.createElement('input')
       el.value = referralLink
       document.body.appendChild(el)
@@ -104,7 +104,6 @@ const referralLink = referralCode
       `Olá! Estou usando o Moniv para controlar as minhas finanças e adorei. Cadastra-te grátis com o meu link: ${referralLink}`
     )
 
-    // IMPORTANTE: não definir destinatário automaticamente
     window.open(`mailto:?subject=${subject}&body=${body}`, '_blank')
 
     analytics.referralShared('email')
@@ -123,9 +122,7 @@ const referralLink = referralCode
 
         analytics.referralShared('native_share')
         return
-      } catch {
-        // Usuário cancelou ou falhou — fallback para copiar link
-      }
+      } catch {}
     }
 
     await copyLink()
