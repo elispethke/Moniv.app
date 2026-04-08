@@ -50,6 +50,18 @@ export const referralService = {
       // Retry by re-running migration 008_award_referral_rpc.sql in Supabase.
       console.error('[referral] Reward RPC failed:', rewardErr.message)
     }
+
+    // 5. Reward referred user: grant 30 days Pro via profiles.pro_expires_at
+    //    Role is NOT changed — user remains 'user', never 'admin'.
+    const referralExpiry = new Date()
+    referralExpiry.setDate(referralExpiry.getDate() + 30)
+    const { error: referredRewardErr } = await supabase
+      .from('profiles')
+      .update({ pro_expires_at: referralExpiry.toISOString() })
+      .eq('id', referredUserId)
+    if (referredRewardErr) {
+      console.error('[referral] Referred user Pro reward failed:', referredRewardErr.message)
+    }
   },
 
   /** Returns how many completed referrals the given user has made. */

@@ -11,11 +11,14 @@ export function useReferral() {
   const [copied, setCopied] = useState(false)
   const [referralCount, setReferralCount] = useState(0)
 
-  // Generate the shareable invite link for this user
-  const referralLink = user ? `${APP_URL}/invite?ref=${user.id}` : null
+  // Gera o link de convite compartilhável para este usuário
+  // FIX: usar referral_code em vez de user.id
+  const referralLink = user?.referral_code
+    ? `${APP_URL}/invite?ref=${user.referral_code}`
+    : null
 
-  // Capture incoming ?ref= param from any page and persist to localStorage.
-  // This ensures the referral is preserved even if the user navigates before signing up.
+  // Captura o parâmetro ?ref= da URL e salva no localStorage
+  // Isso garante que o referral não seja perdido mesmo que o usuário navegue antes de se cadastrar
   useEffect(() => {
     try {
       const params = new URLSearchParams(window.location.search)
@@ -24,25 +27,26 @@ export function useReferral() {
         localStorage.setItem(LS_KEY, refId)
       }
     } catch {
-      // localStorage unavailable (private browsing, etc.)
+      // localStorage pode não estar disponível (modo privado, etc.)
     }
   }, [])
 
-  // Fetch referral count once per user session
+  // Busca a quantidade de referrals uma vez por sessão do usuário
   useEffect(() => {
     if (!user?.id) return
     referralService
       .getReferralCount(user.id)
       .then(setReferralCount)
-      .catch(() => { /* non-blocking */ })
+      .catch(() => { /* erro não bloqueante */ })
   }, [user?.id])
 
   const copyLink = async () => {
     if (!referralLink) return
+
     try {
       await navigator.clipboard.writeText(referralLink)
     } catch {
-      // Fallback for browsers without clipboard API
+      // Fallback para navegadores sem suporte à Clipboard API
       const el = document.createElement('input')
       el.value = referralLink
       document.body.appendChild(el)
@@ -50,13 +54,42 @@ export function useReferral() {
       document.execCommand('copy')
       document.body.removeChild(el)
     }
+
     setCopied(true)
     analytics.referralShared('copy')
     setTimeout(() => setCopied(false), 2000)
   }
 
+  const shareWhatsApp = () => {
+    if (!referralLink) return
+
+    const message = `Comece a usar o Moniv comigo: ${referralLink}`
+
+    window.open(
+      `https://wa.me/?text=${encodeURIComponent(message)}`,
+      '_blank'
+    )
+
+    analytics.referralShared('whatsapp')
+  }
+
+  const shareEmail = () => {
+    if (!referralLink) return
+
+    const subject = encodeURIComponent('Junte-se a mim no Moniv!')
+    const body = encodeURIComponent(
+      `Olá! Estou usando o Moniv para controlar as minhas finanças e adorei. Cadastra-te grátis com o meu link: ${referralLink}`
+    )
+
+    // IMPORTANTE: não definir destinatário automaticamente
+    window.open(`mailto:?subject=${subject}&body=${body}`, '_blank')
+
+    analytics.referralShared('email')
+  }
+
   const shareLink = async () => {
     if (!referralLink) return
+
     if (typeof navigator !== 'undefined' && navigator.share) {
       try {
         await navigator.share({
@@ -64,14 +97,24 @@ export function useReferral() {
           text: 'Controle suas finanças com o Moniv. Cadastre-se grátis! 📊',
           url: referralLink,
         })
+
         analytics.referralShared('native_share')
         return
       } catch {
-        // User cancelled or share failed — fall through to copy
+        // Usuário cancelou ou falhou — fallback para copiar link
       }
     }
+
     await copyLink()
   }
 
-  return { referralLink, copyLink, shareLink, copied, referralCount }
+  return {
+    referralLink,
+    copyLink,
+    shareLink,
+    shareWhatsApp,
+    shareEmail,
+    copied,
+    referralCount
+  }
 }

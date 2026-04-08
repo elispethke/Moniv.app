@@ -6,6 +6,7 @@ import { useTranslation } from '@/hooks/useTranslation'
 
 interface ExpensePieChartProps {
   data: CategoryTotal[]
+  noDataMessage?: string
 }
 
 export const CHART_COLORS = [
@@ -76,7 +77,7 @@ function CenterLabel({
   )
 }
 
-export function ExpensePieChart({ data }: ExpensePieChartProps) {
+export function ExpensePieChart({ data, noDataMessage }: ExpensePieChartProps) {
   const ct = useChartTheme()
   const { t } = useTranslation()
   const { formatCurrency, formatPercentage } = useFormatters()
@@ -84,7 +85,7 @@ export function ExpensePieChart({ data }: ExpensePieChartProps) {
   if (!data.length) {
     return (
       <div className="flex h-48 items-center justify-center">
-        <p className="text-sm text-muted-foreground">{t('charts.no_expenses')}</p>
+        <p className="text-sm text-muted-foreground">{noDataMessage ?? t('charts.no_expenses')}</p>
       </div>
     )
   }

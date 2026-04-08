@@ -66,7 +66,7 @@ export const adminService = {
   },
 
   async inviteUser(email: string): Promise<void> {
-    await invokeAdmin({ action: 'invite-user', email, redirectTo: window.location.origin })
+    await invokeAdmin({ action: 'invite-user', email, redirectTo: `${window.location.origin}/auth/callback` })
   },
 
   async deleteUser(userId: string): Promise<void> {

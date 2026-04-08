@@ -60,6 +60,25 @@ export function calculateSummary(transactions: Transaction[]): TransactionSummar
   return { totalIncome, totalExpense, balance, savingsRate }
 }
 
+export function calculateIncomeCategoryTotals(
+  transactions: Transaction[]
+): CategoryTotal[] {
+  const incomeTxs = transactions.filter((t) => t.type === 'income')
+  const totalIncome = incomeTxs.reduce((sum, t) => sum + t.amount, 0)
+  const categoryMap = new Map<string, number>()
+  incomeTxs.forEach((t) => {
+    categoryMap.set(t.category, (categoryMap.get(t.category) ?? 0) + t.amount)
+  })
+  return Array.from(categoryMap.entries())
+    .map(([category, total]) => ({
+      category: category as CategoryTotal['category'],
+      total,
+      percentage: totalIncome > 0 ? (total / totalIncome) * 100 : 0,
+      type: 'income' as const,
+    }))
+    .sort((a, b) => b.total - a.total)
+}
+
 export function calculateCategoryTotals(
   transactions: Transaction[]
 ): CategoryTotal[] {

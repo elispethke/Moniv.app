@@ -14,8 +14,18 @@ import { supabase } from './supabase'
  */
 export const paymentService = {
   async createCheckoutSession(): Promise<{ url: string }> {
+    await supabase.auth.refreshSession()
+    const { data: sessionData } = await supabase.auth.getSession()
+
+    if (!sessionData.session?.access_token) {
+      throw new Error('Sessão inválida. Por favor, faça login novamente.')
+    }
+
     const { data, error } = await supabase.functions.invoke('create-checkout-session', {
-      method: 'POST',
+      body: { plan: 'monthly' },
+      headers: {
+        Authorization: `Bearer ${sessionData.session.access_token}`,
+      },
     })
 
     if (error) throw new Error(error.message ?? 'Failed to create checkout session')

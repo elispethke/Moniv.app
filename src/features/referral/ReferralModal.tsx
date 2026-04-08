@@ -1,4 +1,4 @@
-import { Copy, Check, Share2, Users, X, Gift, TrendingUp } from 'lucide-react'
+import { Copy, Check, Share2, Users, X, Gift, TrendingUp, MessageCircle, Mail } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { useReferral } from '@/hooks/useReferral'
 import { useTranslation } from '@/hooks/useTranslation'
@@ -12,7 +12,7 @@ interface Props {
 }
 
 export function ReferralModal({ onClose }: Props) {
-  const { referralLink, copyLink, shareLink, copied, referralCount } = useReferral()
+  const { referralLink, copyLink, shareLink, shareWhatsApp, shareEmail, copied, referralCount } = useReferral()
   const { t } = useTranslation()
 
   return (
@@ -20,11 +20,14 @@ export function ReferralModal({ onClose }: Props) {
       {/* Backdrop */}
       <div
         className="absolute inset-0 bg-background/80 backdrop-blur-sm"
-        onClick={onClose}
+        onMouseDown={onClose}
       />
 
       {/* Modal card */}
-      <div className="relative w-full max-w-sm rounded-3xl border border-surface-border bg-surface p-6 shadow-glass animate-scale-in">
+      <div
+        className="relative w-full max-w-sm rounded-3xl border border-surface-border bg-surface p-6 shadow-glass animate-scale-in"
+        onMouseDown={(e) => e.stopPropagation()}
+      >
         {/* Close */}
         <button
           onClick={onClose}
@@ -105,17 +108,27 @@ export function ReferralModal({ onClose }: Props) {
         )}
 
         {/* Action buttons */}
-        <div className="grid grid-cols-2 gap-2">
-          <Button variant="outline" size="md" onClick={copyLink} className="gap-2">
-            {copied
-              ? <Check className="h-4 w-4 text-accent" />
-              : <Copy className="h-4 w-4" />}
-            {copied ? t('referral.copied') : t('referral.copy')}
+        <div className="flex flex-col gap-2">
+          <Button variant="primary" size="md" onClick={shareWhatsApp} className="gap-2 w-full">
+            <MessageCircle className="h-4 w-4" />
+            WhatsApp
           </Button>
-          <Button variant="primary" size="md" onClick={shareLink} className="gap-2">
-            <Share2 className="h-4 w-4" />
-            {t('referral.share')}
-          </Button>
+          <div className="grid grid-cols-3 gap-2">
+            <Button variant="outline" size="md" onClick={copyLink} className="gap-1.5">
+              {copied
+                ? <Check className="h-4 w-4 text-accent" />
+                : <Copy className="h-4 w-4" />}
+              {copied ? t('referral.copied') : t('referral.copy')}
+            </Button>
+            <Button variant="outline" size="md" onClick={shareEmail} className="gap-1.5">
+              <Mail className="h-4 w-4" />
+              Email
+            </Button>
+            <Button variant="outline" size="md" onClick={shareLink} className="gap-1.5">
+              <Share2 className="h-4 w-4" />
+              {t('referral.share')}
+            </Button>
+          </div>
         </div>
 
         <p className="mt-3 text-center text-[11px] text-muted-foreground">

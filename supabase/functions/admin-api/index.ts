@@ -132,7 +132,18 @@ Deno.serve(async (req: Request) => {
         inviteRedirect ? { redirectTo: inviteRedirect } : undefined
       )
       if (inviteErr) return json({ error: inviteErr.message }, 500)
-      return json({ success: true, userId: inviteData.user.id })
+
+      // Grant 30 days Pro to the invited user (profile row may already exist
+      // via trigger; non-fatal if it doesn't yet exist)
+      const invitedUserId = inviteData.user.id
+      const proExpiry = new Date()
+      proExpiry.setDate(proExpiry.getDate() + 30)
+      await adminClient
+        .from('profiles')
+        .update({ pro_expires_at: proExpiry.toISOString() })
+        .eq('id', invitedUserId)
+
+      return json({ success: true, userId: invitedUserId })
     }
 
     // Delete a user completely (auth + user_plans)

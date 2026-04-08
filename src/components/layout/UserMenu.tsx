@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import {
-  Settings, LogOut, ChevronDown, Shield, Users, LifeBuoy,
+  Settings, LogOut, ChevronDown, Shield, Users, LifeBuoy, Mail, Instagram,
 } from 'lucide-react'
+import { Modal } from '@/components/ui/Modal'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/useAuthStore'
 import { useUIStore } from '@/store/useUIStore'
@@ -22,6 +23,7 @@ export function UserMenu() {
   const navigate = useNavigate()
   const [open, setOpen] = useState(false)
   const [showReferral, setShowReferral] = useState(false)
+  const [showSupport, setShowSupport] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
   const profile = user ? toUserProfile(user) : null
@@ -136,15 +138,14 @@ export function UserMenu() {
               </div>
 
               {/* Support */}
-              <a
+              <button
                 role="menuitem"
-                href="mailto:support@moniv.app"
-                onClick={() => setOpen(false)}
+                onClick={() => { setShowSupport(true); setOpen(false) }}
                 className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-foreground-secondary transition-colors hover:bg-surface-elevated hover:text-foreground"
               >
                 <LifeBuoy className="h-4 w-4 flex-shrink-0" />
                 {t('user_menu.support')}
-              </a>
+              </button>
 
               {/* Divider */}
               <div className="my-1 border-t border-surface-border" />
@@ -167,6 +168,39 @@ export function UserMenu() {
       {showReferral && (
         <ReferralModal onClose={() => setShowReferral(false)} />
       )}
+
+      {/* Support modal */}
+      <Modal
+        isOpen={showSupport}
+        onClose={() => setShowSupport(false)}
+        title={t('user_menu.support')}
+        size="sm"
+      >
+        <div className="space-y-3">
+          <div className="flex items-center gap-3 rounded-xl border border-surface-border bg-surface-elevated p-3.5">
+            <Mail className="h-5 w-5 flex-shrink-0 text-primary" />
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                Email
+              </p>
+              <p className="text-sm font-semibold text-foreground select-all">
+                support@moniv.app
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 rounded-xl border border-surface-border bg-surface-elevated p-3.5">
+            <Instagram className="h-5 w-5 flex-shrink-0 text-primary" />
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                Instagram
+              </p>
+              <p className="text-sm font-semibold text-foreground">
+                @moniv.app
+              </p>
+            </div>
+          </div>
+        </div>
+      </Modal>
     </>
   )
 }

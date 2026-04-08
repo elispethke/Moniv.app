@@ -10,49 +10,69 @@ export function useCheckout() {
     setError(null)
 
     try {
-      // Refresh the session first to ensure access_token is not expired
-      const { data: refreshed, error: refreshError } = await supabase.auth.refreshSession()
-      const session = refreshed?.session ?? (
-        refreshError ? null : (await supabase.auth.getSession()).data.session
-      )
-      if (!session) throw new Error('Sessão expirada — faça login novamente.')
+      // 🔴 FIX CRÍTICO:
+      // Força a atualização da sessão antes de chamar a edge function.
+      // Isso garante que o access_token não esteja expirado,
+      // evitando o erro HTTP 401 (Unauthorized).
+      await supabase.auth.refreshSession()
 
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string
-      const anonKey     = import.meta.env.VITE_SUPABASE_ANON_KEY as string
+      // Obtém a sessão atual já atualizada
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
 
-      const response = await fetch(
-        `${supabaseUrl}/functions/v1/create-checkout-session`,
+      // Extrai o token de acesso
+      const token = sessionData.session?.access_token
+
+      // Validação obrigatória da sessão
+      if (sessionError || !token) {
+        throw new Error('Sessão inválida ou expirada — faça login novamente.')
+      }
+
+      // Chamada da edge function do Supabase
+      // supabase.functions.invoke injeta automaticamente o Authorization header
+      // com base na sessão ativa (desde que o token seja válido)
+      const { data, error: fnError } = await supabase.functions.invoke(
+        'create-checkout-session',
         {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${session.access_token}`,
-            'apikey': anonKey,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ plan }),
-        }
+          body: { plan },
+          headers: { Authorization: `Bearer ${token}` },
+        },
       )
 
-      let body: { url?: string; error?: string } = {}
-      try {
-        body = await response.json()
-      } catch {
-        throw new Error(`Servidor retornou resposta inválida (HTTP ${response.status})`)
+      if (fnError) {
+        // FunctionsHttpError pode conter a resposta da API no campo .context
+        let msg = fnError.message
+        try {
+          const ctx = (fnError as { context?: Response }).context
+          if (ctx) {
+            const body = await ctx.json() as { error?: string }
+            if (body?.error) msg = body.error
+          }
+        } catch {
+          // Ignora erro de parsing da resposta
+        }
+        throw new Error(msg)
       }
 
-      if (!response.ok) {
-        throw new Error(body.error || `Erro HTTP ${response.status}`)
-      }
+      const body = data as { url?: string; error?: string }
 
-      if (!body.url) {
+      // Caso a função retorne erro explícito
+      if (body?.error) throw new Error(body.error)
+
+      // Validação crítica: Stripe precisa retornar URL de checkout
+      if (!body?.url) {
         throw new Error('URL do Stripe não retornada. Verifique STRIPE_SECRET_KEY no Supabase.')
       }
 
+      // Redireciona o usuário para o checkout do Stripe
       window.location.href = body.url
 
     } catch (err) {
       console.error('[useCheckout] error:', err)
+
+      // Define erro para exibição na UI
       setError(err instanceof Error ? err.message : 'Erro ao processar pagamento.')
+
+      // Reseta estado de loading
       setLoadingPlan(null)
     }
   }
