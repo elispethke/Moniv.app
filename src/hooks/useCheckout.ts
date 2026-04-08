@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import { supabase } from '@/services/supabase'
 
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string
+
 export function useCheckout() {
   const [loadingPlan, setLoadingPlan] = useState<'monthly' | 'yearly' | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -10,69 +13,56 @@ export function useCheckout() {
     setError(null)
 
     try {
-      // 🔴 FIX CRÍTICO:
-      // Força a atualização da sessão antes de chamar a edge function.
-      // Isso garante que o access_token não esteja expirado,
-      // evitando o erro HTTP 401 (Unauthorized).
+      // 1. Força refresh da sessão para garantir token válido
       await supabase.auth.refreshSession()
-
-      // Obtém a sessão atual já atualizada
       const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
-
-      // Extrai o token de acesso
       const token = sessionData.session?.access_token
 
-      // Validação obrigatória da sessão
       if (sessionError || !token) {
-        throw new Error('Sessão inválida ou expirada — faça login novamente.')
+        throw new Error('Sessão inválida. Faça login novamente.')
       }
 
-      // Chamada da edge function do Supabase
-      // supabase.functions.invoke injeta automaticamente o Authorization header
-      // com base na sessão ativa (desde que o token seja válido)
-      const { data, error: fnError } = await supabase.functions.invoke(
-        'create-checkout-session',
+      // 2. Chama a edge function via fetch puro — sem abstração do SDK.
+      //    Isso garante controle total dos headers e extração correta do erro.
+      const res = await fetch(
+        `${SUPABASE_URL}/functions/v1/create-checkout-session`,
         {
-          body: { plan },
-          headers: { Authorization: `Bearer ${token}` },
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+            apikey: SUPABASE_ANON_KEY,
+          },
+          body: JSON.stringify({ plan }),
         },
       )
 
-      if (fnError) {
-        // FunctionsHttpError pode conter a resposta da API no campo .context
-        let msg = fnError.message
-        try {
-          const ctx = (fnError as { context?: Response }).context
-          if (ctx) {
-            const body = await ctx.json() as { error?: string }
-            if (body?.error) msg = body.error
-          }
-        } catch {
-          // Ignora erro de parsing da resposta
-        }
+      // 3. Extrai o body mesmo em caso de erro para mostrar mensagem real
+      let body: { url?: string; error?: string } = {}
+      try {
+        body = await res.json()
+      } catch {
+        // resposta sem body válido
+      }
+
+      if (!res.ok) {
+        const msg = body?.error ?? `Erro ${res.status} na edge function`
+        console.error('[useCheckout] edge function error:', res.status, body)
         throw new Error(msg)
       }
 
-      const body = data as { url?: string; error?: string }
-
-      // Caso a função retorne erro explícito
       if (body?.error) throw new Error(body.error)
 
-      // Validação crítica: Stripe precisa retornar URL de checkout
       if (!body?.url) {
-        throw new Error('URL do Stripe não retornada. Verifique STRIPE_SECRET_KEY no Supabase.')
+        throw new Error('URL do Stripe não retornada. Verifique as variáveis STRIPE_SECRET_KEY, STRIPE_PRICE_MONTHLY e STRIPE_PRICE_YEARLY no Supabase.')
       }
 
-      // Redireciona o usuário para o checkout do Stripe
+      // 4. Redireciona para o checkout do Stripe
       window.location.href = body.url
 
     } catch (err) {
       console.error('[useCheckout] error:', err)
-
-      // Define erro para exibição na UI
       setError(err instanceof Error ? err.message : 'Erro ao processar pagamento.')
-
-      // Reseta estado de loading
       setLoadingPlan(null)
     }
   }
