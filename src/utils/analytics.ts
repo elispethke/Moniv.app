@@ -21,8 +21,8 @@ function emit(event: string, properties?: Properties) {
 }
 
 export const analytics = {
-  /** User shared their referral link (copy or native share). */
-  referralShared(method: 'copy' | 'native_share') {
+  /** User shared their referral link. */
+  referralShared(method: 'copy' | 'native_share' | 'whatsapp' | 'email') {
     emit('referral_shared', { method })
   },
 

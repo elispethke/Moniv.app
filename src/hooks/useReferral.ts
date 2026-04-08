@@ -11,10 +11,9 @@ export function useReferral() {
   const [copied, setCopied] = useState(false)
   const [referralCount, setReferralCount] = useState(0)
 
-  // Gera o link de convite compartilhável para este usuário
-  // FIX: usar referral_code em vez de user.id
-  const referralLink = user?.referral_code
-    ? `${APP_URL}/invite?ref=${user.referral_code}`
+  // Gera o link de convite com o ID do utilizador como referência
+  const referralLink = user?.id
+    ? `${APP_URL}/invite?ref=${user.id}`
     : null
 
   // Captura o parâmetro ?ref= da URL e salva no localStorage
