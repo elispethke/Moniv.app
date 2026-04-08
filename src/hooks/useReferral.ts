@@ -12,9 +12,33 @@ export function useReferral() {
   const [referralCount, setReferralCount] = useState(0)
 
   // Gera o link de convite com o ID do utilizador como referência
-  const referralLink = user?.id
-    ? `${APP_URL}/invite?ref=${user.id}`
-    : null
+  
+  const [referralCode, setReferralCode] = useState<string | null>(null)
+
+   useEffect(() => {
+      if (!user?.id) return
+
+  const fetchReferralCode = async () => {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('referral_code')
+      .eq('id', user.id)
+      .single()
+
+    if (error) {
+      console.error('Erro ao buscar referral_code:', error.message)
+      return
+    }
+
+    setReferralCode(data?.referral_code ?? null)
+  }
+
+  fetchReferralCode()
+}, [user?.id])
+
+const referralLink = referralCode
+  ? `${APP_URL}/invite?ref=${referralCode}`
+  : null
 
   // Captura o parâmetro ?ref= da URL e salva no localStorage
   // Isso garante que o referral não seja perdido mesmo que o usuário navegue antes de se cadastrar
