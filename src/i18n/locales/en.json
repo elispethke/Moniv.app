@@ -386,5 +386,21 @@
     "mindset_stat_1": "of users spot unnecessary spending in the first week",
     "mindset_stat_2": "average savings after 3 months of use",
     "mindset_stat_3": "satisfaction with financial clarity"
+  },
+  "install_banner": {
+    "title": "Install Moniv on your device",
+    "subtitle": "Direct access, works offline, and no App Store space needed.",
+    "install_btn": "Install now",
+    "installing": "Installing…",
+    "installed_title": "App installed",
+    "installed_subtitle": "You are using Moniv as a native app.",
+    "ios_step1": "Tap the share icon",
+    "ios_step2": "Select \"Add to Home Screen\"",
+    "android_step1": "Tap the browser menu",
+    "android_step2": "Select \"Install App\"",
+    "desktop_step1": "Click the install icon in the address bar",
+    "desktop_step2": "Confirm installation in the dialog",
+    "manual_title": "How to install",
+    "domain": "www.moniv.app"
   }
 }

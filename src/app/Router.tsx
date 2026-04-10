@@ -1,28 +1,62 @@
+import { lazy, Suspense } from 'react'
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
-import { LandingPage } from '@/features/landing/LandingPage'
-import { EntryScreen } from '@/features/entry/EntryScreen'
-import { OnboardingPage } from '@/features/onboarding/OnboardingPage'
-import { DashboardPage } from '@/features/dashboard/DashboardPage'
-import { TransactionsPage } from '@/features/transactions/TransactionsPage'
-import { InsightsPage } from '@/features/insights/InsightsPage'
-import { LoginPage } from '@/features/auth/LoginPage'
-import { SignupPage } from '@/features/auth/SignupPage'
-import { ForgotPasswordPage } from '@/features/auth/ForgotPasswordPage'
-import { ResetPasswordPage } from '@/features/auth/ResetPasswordPage'
-import { AuthCallbackPage } from '@/features/auth/AuthCallbackPage'
-import { BudgetsPage } from '@/features/pro/budgets/BudgetsPage'
-import { GoalsPage } from '@/features/pro/goals/GoalsPage'
-import { InstallmentsPage } from '@/features/pro/installments/InstallmentsPage'
-import { RecurringPage } from '@/features/pro/recurring/RecurringPage'
-import { WalletsPage } from '@/features/pro/wallets/WalletsPage'
-import { UpgradePage } from '@/features/pro/UpgradePage'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { ProtectedRoute, PublicOnlyRoute } from '@/components/auth/ProtectedRoute'
 import { AdminRoute } from '@/components/auth/AdminRoute'
-import { AdminPage } from '@/features/admin/AdminPage'
 import { Navbar } from '@/components/layout/Navbar'
 import { BottomNav } from '@/components/layout/BottomNav'
+import { DashboardSkeleton } from '@/components/skeletons/DashboardSkeleton'
+import { TransactionsSkeleton } from '@/components/skeletons/TransactionsSkeleton'
+import { InsightsSkeleton } from '@/components/skeletons/InsightsSkeleton'
+import { ProFeatureSkeleton } from '@/components/skeletons/ProFeatureSkeleton'
+import { AppDownloadSection } from '@/components/pwa/AppDownloadSection'
 
-/** Captures ?ref= param, writes to localStorage, then redirects to /signup */
+// ── Lazy imports ─────────────────────────────────────────────────────────────
+// Páginas públicas (carregam rápido — não há motivo para lazy, mas isolamos
+// o AdminPage e as Pro features que são pesadas)
+import { LandingPage }        from '@/features/landing/LandingPage'
+import { EntryScreen }        from '@/features/entry/EntryScreen'
+import { LoginPage }          from '@/features/auth/LoginPage'
+import { SignupPage }         from '@/features/auth/SignupPage'
+import { ForgotPasswordPage } from '@/features/auth/ForgotPasswordPage'
+import { ResetPasswordPage }  from '@/features/auth/ResetPasswordPage'
+import { AuthCallbackPage }   from '@/features/auth/AuthCallbackPage'
+import { PrivacyPage }        from '@/features/legal/PrivacyPage'
+import { TermsPage }          from '@/features/legal/TermsPage'
+
+// Páginas do app shell — lazy (reduzem bundle inicial significativamente)
+const DashboardPage     = lazy(() => import('@/features/dashboard/DashboardPage').then(m => ({ default: m.DashboardPage })))
+const TransactionsPage  = lazy(() => import('@/features/transactions/TransactionsPage').then(m => ({ default: m.TransactionsPage })))
+const InsightsPage      = lazy(() => import('@/features/insights/InsightsPage').then(m => ({ default: m.InsightsPage })))
+const OnboardingPage    = lazy(() => import('@/features/onboarding/OnboardingPage').then(m => ({ default: m.OnboardingPage })))
+
+// Pro features — lazy (só carregam para utilizadores Pro)
+const BudgetsPage       = lazy(() => import('@/features/pro/budgets/BudgetsPage').then(m => ({ default: m.BudgetsPage })))
+const GoalsPage         = lazy(() => import('@/features/pro/goals/GoalsPage').then(m => ({ default: m.GoalsPage })))
+const InstallmentsPage  = lazy(() => import('@/features/pro/installments/InstallmentsPage').then(m => ({ default: m.InstallmentsPage })))
+const RecurringPage     = lazy(() => import('@/features/pro/recurring/RecurringPage').then(m => ({ default: m.RecurringPage })))
+const WalletsPage       = lazy(() => import('@/features/pro/wallets/WalletsPage').then(m => ({ default: m.WalletsPage })))
+const UpgradePage       = lazy(() => import('@/features/pro/UpgradePage').then(m => ({ default: m.UpgradePage })))
+const AdminPage         = lazy(() => import('@/features/admin/AdminPage').then(m => ({ default: m.AdminPage })))
+
+// ── Page skeleton — fallback enquanto o chunk carrega ────────────────────────
+function PageSkeleton() {
+  return (
+    <div className="flex min-h-[60vh] items-center justify-center">
+      <div className="flex flex-col items-center gap-3">
+        <img
+          src="/logo.png"
+          alt=""
+          aria-hidden
+          className="h-10 w-10 rounded-2xl animate-pulse-slow opacity-60"
+        />
+        <div className="h-1 w-24 rounded-full bg-primary/20 animate-pulse" />
+      </div>
+    </div>
+  )
+}
+
+/** Captura ?ref= param, escreve em localStorage e redireciona para /signup */
 function InviteRedirect() {
   const { search } = useLocation()
   const params = new URLSearchParams(search)
@@ -38,19 +72,116 @@ function AppShell() {
     <>
       <Navbar />
       <Routes>
-        <Route path="/transactions"     element={<TransactionsPage />} />
-        <Route path="/insights"         element={<InsightsPage />} />
-        <Route path="/dashboard"        element={<DashboardPage />} />
+        <Route
+          path="/transactions"
+          element={
+            <ErrorBoundary feature="transactions">
+              <Suspense fallback={<TransactionsSkeleton />}>
+                <TransactionsPage />
+              </Suspense>
+            </ErrorBoundary>
+          }
+        />
+        <Route
+          path="/insights"
+          element={
+            <ErrorBoundary feature="insights">
+              <Suspense fallback={<InsightsSkeleton />}>
+                <InsightsPage />
+              </Suspense>
+            </ErrorBoundary>
+          }
+        />
+        <Route
+          path="/dashboard"
+          element={
+            <ErrorBoundary feature="dashboard">
+              <Suspense fallback={<DashboardSkeleton />}>
+                <DashboardPage />
+              </Suspense>
+            </ErrorBoundary>
+          }
+        />
+
         {/* Pro features */}
-        <Route path="/pro/budgets"      element={<BudgetsPage />} />
-        <Route path="/pro/goals"        element={<GoalsPage />} />
-        <Route path="/pro/installments" element={<InstallmentsPage />} />
-        <Route path="/pro/recurring"    element={<RecurringPage />} />
-        <Route path="/pro/wallets"      element={<WalletsPage />} />
-        <Route path="/pro/upgrade"      element={<UpgradePage />} />
-        <Route path="/pricing"          element={<UpgradePage />} />
-        <Route path="*"                 element={<Navigate to="/transactions" replace />} />
+        <Route
+          path="/pro/budgets"
+          element={
+            <ErrorBoundary feature="budgets">
+              <Suspense fallback={<ProFeatureSkeleton />}>
+                <BudgetsPage />
+              </Suspense>
+            </ErrorBoundary>
+          }
+        />
+        <Route
+          path="/pro/goals"
+          element={
+            <ErrorBoundary feature="goals">
+              <Suspense fallback={<ProFeatureSkeleton />}>
+                <GoalsPage />
+              </Suspense>
+            </ErrorBoundary>
+          }
+        />
+        <Route
+          path="/pro/installments"
+          element={
+            <ErrorBoundary feature="installments">
+              <Suspense fallback={<ProFeatureSkeleton />}>
+                <InstallmentsPage />
+              </Suspense>
+            </ErrorBoundary>
+          }
+        />
+        <Route
+          path="/pro/recurring"
+          element={
+            <ErrorBoundary feature="recurring">
+              <Suspense fallback={<ProFeatureSkeleton />}>
+                <RecurringPage />
+              </Suspense>
+            </ErrorBoundary>
+          }
+        />
+        <Route
+          path="/pro/wallets"
+          element={
+            <ErrorBoundary feature="wallets">
+              <Suspense fallback={<ProFeatureSkeleton />}>
+                <WalletsPage />
+              </Suspense>
+            </ErrorBoundary>
+          }
+        />
+        <Route
+          path="/pro/upgrade"
+          element={
+            <ErrorBoundary feature="upgrade">
+              <Suspense fallback={<PageSkeleton />}>
+                <UpgradePage />
+              </Suspense>
+            </ErrorBoundary>
+          }
+        />
+        <Route
+          path="/pricing"
+          element={
+            <ErrorBoundary feature="upgrade">
+              <Suspense fallback={<PageSkeleton />}>
+                <UpgradePage />
+              </Suspense>
+            </ErrorBoundary>
+          }
+        />
+        <Route path="*" element={<Navigate to="/transactions" replace />} />
       </Routes>
+
+      {/* App download section — inline card visible on all authenticated pages */}
+      <div className="mx-auto max-w-6xl xl:max-w-7xl px-4 xl:px-6 pb-2">
+        <AppDownloadSection variant="inline" />
+      </div>
+
       <BottomNav />
     </>
   )
@@ -59,30 +190,52 @@ function AppShell() {
 export function AppRouter() {
   return (
     <Routes>
-      {/* "/" = public landing. Auth check + /dashboard redirect handled inside */}
+      {/* Página inicial pública */}
       <Route path="/" element={<LandingPage />} />
 
-      {/* Legacy entry/onboarding screen */}
+      {/* Páginas legais — sempre públicas */}
+      <Route path="/privacy" element={<PrivacyPage />} />
+      <Route path="/terms"   element={<TermsPage />} />
+
+      {/* Ecrã legacy */}
       <Route path="/entry" element={<EntryScreen />} />
 
       <Route element={<PublicOnlyRoute />}>
-        <Route path="/login"            element={<LoginPage />} />
-        <Route path="/signup"           element={<SignupPage />} />
-        <Route path="/forgot-password"  element={<ForgotPasswordPage />} />
+        <Route path="/login"           element={<LoginPage />} />
+        <Route path="/signup"          element={<SignupPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       </Route>
 
       <Route path="/reset-password" element={<ResetPasswordPage />} />
 
-      {/* Auth callback — handles Supabase email invite and magic-link tokens */}
+      {/* Auth callback — Supabase email invite e magic-link */}
       <Route path="/auth/callback" element={<AuthCallbackPage />} />
 
-      {/* Referral invite link — captures ?ref= and redirects to /signup */}
+      {/* Referral — captura ?ref= e redireciona para /signup */}
       <Route path="/invite" element={<InviteRedirect />} />
 
       <Route element={<ProtectedRoute />}>
-        <Route path="/onboarding" element={<OnboardingPage />} />
+        <Route
+          path="/onboarding"
+          element={
+            <ErrorBoundary feature="onboarding">
+              <Suspense fallback={<PageSkeleton />}>
+                <OnboardingPage />
+              </Suspense>
+            </ErrorBoundary>
+          }
+        />
         <Route element={<AdminRoute />}>
-          <Route path="/admin" element={<AdminPage />} />
+          <Route
+            path="/admin"
+            element={
+              <ErrorBoundary feature="admin">
+                <Suspense fallback={<PageSkeleton />}>
+                  <AdminPage />
+                </Suspense>
+              </ErrorBoundary>
+            }
+          />
         </Route>
         <Route path="/*" element={<AppShell />} />
       </Route>

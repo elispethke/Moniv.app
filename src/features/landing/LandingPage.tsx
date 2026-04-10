@@ -7,6 +7,7 @@ import {
 import { useAuthStore } from '@/store/useAuthStore'
 import { useTranslation } from '@/hooks/useTranslation'
 import { LanguageSelector } from '@/components/selectors/LanguageSelector'
+import { AppDownloadSection } from '@/components/pwa/AppDownloadSection'
 
 // ── Splash loader ──────────────────────────────────────────────────────────────
 function SplashLoader() {
@@ -699,14 +700,50 @@ export function LandingPage() {
         </div>
       </section>
 
+      {/* ── App Download Section ─────────────────────────────────────────── */}
+      <AppDownloadSection variant="landing" />
+
       {/* ── Footer ───────────────────────────────────────────────────────── */}
       <footer className="relative z-10 border-t border-surface-border/50">
-        <div className="flex w-full items-center justify-between px-6 lg:px-16 xl:px-24 py-6 text-xs text-muted-foreground">
-          <div className="flex items-center gap-2">
-            <img src="/logo.png" alt="Moniv" className="h-5 w-5 rounded-lg object-cover" />
-            <span className="font-semibold">Mon<span className="text-primary">iv</span></span>
+        <div className="mx-auto w-full max-w-7xl px-6 lg:px-16 xl:px-24 py-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            {/* Brand */}
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <img src="/logo.png" alt="Moniv" className="h-5 w-5 rounded-lg object-cover" />
+              <span className="font-semibold text-foreground">Mon<span className="text-primary">iv</span></span>
+              <span className="hidden sm:inline">·</span>
+              <span className="hidden sm:inline">{t('landing.footer_copy', { year: String(new Date().getFullYear()) })}</span>
+            </div>
+
+            {/* Legal links */}
+            <div className="flex items-center gap-4 text-xs text-muted-foreground">
+              <a
+                href="/privacy"
+                className="hover:text-primary transition-colors"
+              >
+                Política de Privacidade
+              </a>
+              <span className="text-surface-border">·</span>
+              <a
+                href="/terms"
+                className="hover:text-primary transition-colors"
+              >
+                Termos de Uso
+              </a>
+              <span className="text-surface-border">·</span>
+              <a
+                href="mailto:support@moniv.app"
+                className="hover:text-primary transition-colors"
+              >
+                Suporte
+              </a>
+            </div>
           </div>
-          <p>{t('landing.footer_copy', { year: String(new Date().getFullYear()) })}</p>
+
+          {/* Mobile copyright */}
+          <p className="mt-2 text-xs text-muted-foreground sm:hidden">
+            {t('landing.footer_copy', { year: String(new Date().getFullYear()) })}
+          </p>
         </div>
       </footer>
     </div>

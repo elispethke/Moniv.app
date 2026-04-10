@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Moon, Sun, Monitor, Check } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { Modal } from '@/components/ui/Modal'
 import { Select } from '@/components/ui/Select'
 import { Button } from '@/components/ui/Button'
@@ -102,6 +103,32 @@ export function SettingsModal() {
         <Button variant="primary" fullWidth onClick={handleSave}>
           {tDraft('common.save')}
         </Button>
+
+        {/* Legal links */}
+        <div className="flex items-center justify-center gap-3 pt-1">
+          <Link
+            to="/privacy"
+            onClick={closeModal}
+            className="text-xs text-foreground-muted hover:text-primary transition-colors"
+          >
+            Privacidade
+          </Link>
+          <span className="text-surface-border text-xs">·</span>
+          <Link
+            to="/terms"
+            onClick={closeModal}
+            className="text-xs text-foreground-muted hover:text-primary transition-colors"
+          >
+            Termos
+          </Link>
+          <span className="text-surface-border text-xs">·</span>
+          <a
+            href="mailto:support@moniv.app"
+            className="text-xs text-foreground-muted hover:text-primary transition-colors"
+          >
+            Suporte
+          </a>
+        </div>
 
       </div>
     </Modal>

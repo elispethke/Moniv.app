@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Copy, Check, Share2, Users, X, Gift, TrendingUp, MessageCircle, Mail } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { useReferral } from '@/hooks/useReferral'
@@ -13,6 +14,13 @@ interface Props {
 export function ReferralModal({ onClose }: Props) {
   const { referralLink, copyLink, shareLink, shareWhatsApp, shareEmail, copied, referralCount } = useReferral()
   const { t } = useTranslation()
+
+  // Fechar ao pressionar ESC
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+    document.addEventListener('keydown', handler)
+    return () => document.removeEventListener('keydown', handler)
+  }, [onClose])
 
   return (
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">

@@ -77,7 +77,19 @@ export function SignupForm() {
         Criar conta
       </Button>
 
-      <p className="pt-2 text-center text-sm text-muted-foreground">
+      <p className="pt-1 text-center text-xs text-muted-foreground leading-relaxed">
+        Ao criar conta, concorda com os nossos{' '}
+        <Link to="/terms" className="font-medium text-primary hover:underline">
+          Termos de Uso
+        </Link>{' '}
+        e{' '}
+        <Link to="/privacy" className="font-medium text-primary hover:underline">
+          Política de Privacidade
+        </Link>
+        .
+      </p>
+
+      <p className="text-center text-sm text-muted-foreground">
         Já tem uma conta?{' '}
         <Link
           to="/login"

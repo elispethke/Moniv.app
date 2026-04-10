@@ -222,7 +222,7 @@
     "footer_copy": "© {{year}} Moniv. Alle Rechte vorbehalten.",
     "mindset_line_1": "Möchten Sie wirklich mehr Geld verdienen?",
     "mindset_line_2": "Dann beginnen Sie damit zu verstehen, wie Sie das verwalten, was Sie bereits haben — und wohin es fließt.",
-   "mindset_desc": "Moniv verwandelt Daten in Klarheit. Sehen Sie genau, wohin Ihr Geld fließt — und treffen Sie Entscheidungen mit Sicherheit.",
+    "mindset_desc": "Moniv verwandelt Daten in Klarheit. Sehen Sie genau, wohin Ihr Geld fließt — und treffen Sie Entscheidungen mit Sicherheit.",
     "mindset_stat_1": "der Nutzer erkennen unnötige Ausgaben in der ersten Woche",
     "mindset_stat_2": "durchschnittliche Ersparnisse nach 3 Monaten Nutzung",
     "mindset_stat_3": "Zufriedenheit mit finanzieller Klarheit"
@@ -239,5 +239,21 @@
     "already_pro": "Sie haben bereits Pro!",
     "already_pro_desc": "Alle Funktionen sind freigeschaltet.",
     "upgrade_disclaimer": "Jederzeit kündbar. Keine Verpflichtung."
+  },
+  "install_banner": {
+    "title": "Installiere Moniv auf deinem Gerät",
+    "subtitle": "Direktzugriff, funktioniert offline, kein App-Store-Speicher nötig.",
+    "install_btn": "Jetzt installieren",
+    "installing": "Wird installiert…",
+    "installed_title": "App installiert",
+    "installed_subtitle": "Du verwendest Moniv als native App.",
+    "ios_step1": "Tippe auf das Teilen-Symbol",
+    "ios_step2": "Wähle «Zum Home-Bildschirm»",
+    "android_step1": "Tippe auf das Browser-Menü",
+    "android_step2": "Wähle «App installieren»",
+    "desktop_step1": "Klicke auf das Installations-Symbol in der Adressleiste",
+    "desktop_step2": "Bestätige die Installation im Dialog",
+    "manual_title": "So installierst du",
+    "domain": "www.moniv.app"
   }
 }

@@ -17,6 +17,8 @@ import { SettingsModal } from '@/features/settings/SettingsModal'
 import { ProModal } from '@/components/ui/ProModal'
 import { Modal } from '@/components/ui/Modal'
 import { AddTransactionForm } from '@/features/transactions/components/AddTransactionForm'
+import { PWAUpdateBanner } from '@/components/pwa/PWAUpdateBanner'
+import { PWAInstallBanner } from '@/components/pwa/PWAInstallBanner'
 import { useUIStore } from '@/store/useUIStore'
 import { useTranslation } from '@/hooks/useTranslation'
 import type { Transaction } from '@/types/transaction'
@@ -89,6 +91,10 @@ function AppContent() {
       )}
 
       {activeModal === 'upgrade' && <ProModal onClose={closeModal} />}
+
+      {/* PWA banners — update notification + install prompt */}
+      <PWAUpdateBanner />
+      <PWAInstallBanner />
     </div>
   )
 }

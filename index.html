@@ -1,28 +1,56 @@
 <!doctype html>
-<html lang="en">
+<html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
 
-    <!-- Favicon principal (SVG) -->
+    <!-- ── Viewport ─────────────────────────────────────────────────────── -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <!-- ── Primary favicon ──────────────────────────────────────────────── -->
     <link rel="icon" type="image/svg+xml" href="/icons/favicon.svg" />
+    <link rel="icon" type="image/png"     href="/logo.png" sizes="192x192" />
+    <link rel="icon" type="image/png"     href="/logo.png" sizes="512x512" />
 
-    <!-- Fallback -->
-    <link rel="icon" type="image/png" href="/logo.png" />
+    <!-- ── Theme color (dark default, light override via media) ─────────── -->
+    <meta name="theme-color" content="#6366f1" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#6366f1" media="(prefers-color-scheme: light)" />
 
-    <!-- Mobile / PWA -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#6366f1" />
+    <!-- ── SEO ──────────────────────────────────────────────────────────── -->
+    <meta name="description" content="Moniv — controle total das suas finanças pessoais. Acompanhe receitas, despesas, metas e orçamentos num único app seguro e intuitivo." />
+    <meta name="keywords"    content="finanças pessoais, controle financeiro, orçamento, metas financeiras, app finanças, moniv" />
+    <meta name="author"      content="Moniv" />
+    <meta name="robots"      content="index, follow" />
 
-    <!-- SEO -->
-    <meta name="description" content="Moniv - Your intelligent financial assistant" />
+    <!-- ── Open Graph ───────────────────────────────────────────────────── -->
+    <meta property="og:type"        content="website" />
+    <meta property="og:site_name"   content="Moniv" />
+    <meta property="og:title"       content="Moniv — Finanças Pessoais Inteligentes" />
+    <meta property="og:description" content="Controle total das suas finanças. Receitas, despesas, metas e orçamentos num único lugar." />
+    <meta property="og:url"         content="https://www.moniv.app" />
+    <meta property="og:image"       content="https://www.moniv.app/logo.png" />
+    <meta property="og:locale"      content="pt_BR" />
 
-    <!-- iOS support -->
-    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <!-- ── Twitter Card ─────────────────────────────────────────────────── -->
+    <meta name="twitter:card"        content="summary_large_image" />
+    <meta name="twitter:title"       content="Moniv — Finanças Pessoais Inteligentes" />
+    <meta name="twitter:description" content="Controle total das suas finanças pessoais." />
+    <meta name="twitter:image"       content="https://www.moniv.app/logo.png" />
+
+    <!-- ── iOS PWA ──────────────────────────────────────────────────────── -->
+    <meta name="apple-mobile-web-app-capable"          content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="Moniv" />
+    <meta name="apple-mobile-web-app-title"            content="Moniv" />
     <link rel="apple-touch-icon" href="/logo.png" />
 
-    <title>Moniv</title>
+    <!-- ── Microsoft Tiles ──────────────────────────────────────────────── -->
+    <meta name="msapplication-TileColor" content="#6366f1" />
+    <meta name="msapplication-TileImage" content="/logo.png" />
+
+    <!-- ── Preconnect para serviços externos ────────────────────────────── -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <title>Moniv — Finanças Pessoais</title>
   </head>
 
   <body>
