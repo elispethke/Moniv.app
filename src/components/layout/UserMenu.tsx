@@ -177,20 +177,32 @@ export function UserMenu() {
         size="sm"
       >
         <div className="space-y-3">
-          <div className="flex items-center gap-3 rounded-xl border border-surface-border bg-surface-elevated p-3.5">
+          <a
+            href="mailto:support@moniv.app"
+            className="flex items-center gap-3 rounded-xl border border-surface-border bg-surface-elevated p-3.5 transition-colors hover:border-primary/40 hover:bg-primary/5 active:opacity-80"
+          >
             <Mail className="h-5 w-5 flex-shrink-0 text-primary" />
-            <div>
+            <div className="min-w-0">
               <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                 Email
               </p>
-              <p className="text-sm font-semibold text-foreground select-all">
+              <p className="text-sm font-semibold text-foreground truncate">
                 support@moniv.app
               </p>
             </div>
-          </div>
-          <div className="flex items-center gap-3 rounded-xl border border-surface-border bg-surface-elevated p-3.5">
+            <svg className="ml-auto h-4 w-4 flex-shrink-0 text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+            </svg>
+          </a>
+
+          <a
+            href="https://www.instagram.com/moniv.app?igsh=MTBtZnBvcHZjazlyNQ%3D%3D&utm_source=qr"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-3 rounded-xl border border-surface-border bg-surface-elevated p-3.5 transition-colors hover:border-primary/40 hover:bg-primary/5 active:opacity-80"
+          >
             <Instagram className="h-5 w-5 flex-shrink-0 text-primary" />
-            <div>
+            <div className="min-w-0">
               <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                 Instagram
               </p>
@@ -198,7 +210,10 @@ export function UserMenu() {
                 @moniv.app
               </p>
             </div>
-          </div>
+            <svg className="ml-auto h-4 w-4 flex-shrink-0 text-muted-foreground" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/>
+            </svg>
+          </a>
         </div>
       </Modal>
     </>

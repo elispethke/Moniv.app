@@ -40,7 +40,7 @@ export function ProModal({ onClose }: ProModalProps) {
       className="fixed inset-0 z-50 flex items-end justify-center sm:items-center p-4"
       onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
     >
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm cursor-pointer" onClick={onClose} />
 
       <div className="relative w-full max-w-sm rounded-3xl border border-surface-border bg-background shadow-2xl overflow-hidden animate-scale-in">
         <button

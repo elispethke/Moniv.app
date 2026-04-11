@@ -54,10 +54,10 @@ export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalPr
       aria-label={title}
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center animate-fade-in"
     >
-      {/* Backdrop — fechar ao clicar fora */}
+      {/* Backdrop — fechar ao clicar fora (cursor-pointer necessário para iOS Safari) */}
       <div
         aria-hidden="true"
-        className="absolute inset-0 bg-background/80 backdrop-blur-sm"
+        className="absolute inset-0 bg-background/80 backdrop-blur-sm cursor-pointer"
         onClick={onClose}
       />
 

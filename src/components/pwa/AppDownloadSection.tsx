@@ -251,14 +251,21 @@ function InstallButton({ t, variant = 'landing' }: InstallButtonProps) {
 
   const handleClick = () => {
     if (canInstall) {
-      // Chrome / Android: fire the real native prompt
+      // Chrome / Android: fires the real native prompt
       promptInstall()
     } else if (platform === 'ios') {
       // iOS Safari: toggle the "Add to Home Screen" hint
       setShowIOSHint(prev => !prev)
     }
-    // Desktop Safari / unknown: do nothing — button is visible but passive
+    // Desktop Safari / unknown: passive — no errors, no fake behaviour
   }
+
+  // Label adapts to platform so the button always makes sense to the user
+  const buttonLabel = isPrompting
+    ? t('install_banner.installing')
+    : platform === 'ios' && !canInstall
+      ? 'Como instalar'
+      : t('install_banner.install_btn')
 
   if (variant === 'landing') {
     return (
@@ -277,7 +284,7 @@ function InstallButton({ t, variant = 'landing' }: InstallButtonProps) {
           )}
         >
           <DownloadIcon />
-          {isPrompting ? t('install_banner.installing') : t('install_banner.install_btn')}
+          {buttonLabel}
         </button>
         {showIOSHint && (
           <IOSHint variant="landing" onClose={() => setShowIOSHint(false)} />
@@ -300,7 +307,7 @@ function InstallButton({ t, variant = 'landing' }: InstallButtonProps) {
         )}
       >
         <DownloadIcon />
-        {isPrompting ? t('install_banner.installing') : t('install_banner.install_btn')}
+        {buttonLabel}
       </button>
       {showIOSHint && (
         <IOSHint variant="inline" onClose={() => setShowIOSHint(false)} />
