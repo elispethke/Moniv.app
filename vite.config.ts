@@ -23,6 +23,7 @@ export default defineConfig({
       ],
 
       manifest: {
+        id: '/?source=pwa',
         name: 'Moniv - Finanças Pessoais',
         short_name: 'Moniv',
         description: 'Seu assistente financeiro pessoal inteligente. Controle receitas, despesas e metas num único lugar.',
@@ -52,10 +53,10 @@ export default defineConfig({
             type: 'image/png',
             purpose: 'any',
           },
-          // Maskable (safe-zone padding for Android adaptive icons)
+          // Maskable (safe-zone padding for Android adaptive icons) — real size 1024x1024
           {
             src: '/icons/logo-maskable.png',
-            sizes: '512x512',
+            sizes: '1024x1024',
             type: 'image/png',
             purpose: 'maskable',
           },
@@ -74,7 +75,7 @@ export default defineConfig({
           },
           {
             src: '/icons/logo-maskable.webp',
-            sizes: '512x512',
+            sizes: '1024x1024',
             type: 'image/webp',
             purpose: 'maskable',
           },
