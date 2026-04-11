@@ -55,6 +55,25 @@
 
   <body>
     <div id="root"></div>
+
+    <!--
+      Captura beforeinstallprompt ANTES do React montar.
+      O evento pode disparar muito cedo — antes do bundle JS carregar.
+      Guardamos numa variável global para o hook usePWAInstall ler na inicialização.
+    -->
+    <script>
+      window.__pwaInstallPrompt = null;
+      window.addEventListener('beforeinstallprompt', function (e) {
+        e.preventDefault();
+        window.__pwaInstallPrompt = e;
+        window.dispatchEvent(new Event('pwa-prompt-ready'));
+      });
+      window.addEventListener('appinstalled', function () {
+        window.__pwaInstallPrompt = null;
+        window.dispatchEvent(new Event('pwa-app-installed'));
+      });
+    </script>
+
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
