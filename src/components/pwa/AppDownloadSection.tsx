@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState } from 'react'
 import { useTranslation } from '@/hooks/useTranslation'
 import { usePWAInstall } from '@/hooks/usePWAInstall'
 import { usePlatformDetect } from '@/hooks/usePlatformDetect'
+import { Modal } from '@/components/ui/Modal'
 import { cn } from '@/utils/cn'
 
 // ── Icons ────────────────────────────────────────────────────────────────────
@@ -122,103 +123,100 @@ function PWAPhoneMockup() {
   )
 }
 
-// ── iOS "Add to Home Screen" hint tooltip ────────────────────────────────────
+// ── iOS Install Guide — proper centered modal ─────────────────────────────────
 
-function IOSHint({ onClose, variant }: { onClose: () => void; variant: 'landing' | 'inline' }) {
-  const ref = useRef<HTMLDivElement>(null)
-
-  // Close on outside click
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) onClose()
-    }
-    document.addEventListener('mousedown', handler)
-    return () => document.removeEventListener('mousedown', handler)
-  }, [onClose])
-
-  // Close on ESC
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
-    document.addEventListener('keydown', handler)
-    return () => document.removeEventListener('keydown', handler)
-  }, [onClose])
-
-  const isDark = variant === 'landing'
-
+function IOSInstallModal({ onClose }: { onClose: () => void }) {
   return (
-    <div
-      ref={ref}
-      role="tooltip"
-      className={cn(
-        'absolute z-50 w-72 rounded-2xl p-4 shadow-2xl',
-        'border animate-fade-in',
-        // Position: above the button on landing, below on inline
-        variant === 'landing'
-          ? 'bottom-full mb-3 left-1/2 -translate-x-1/2 lg:left-0 lg:translate-x-0'
-          : 'top-full mt-2 right-0',
-        isDark
-          ? 'bg-[#1a1a2e] border-white/15'
-          : 'bg-surface border-surface-border',
-      )}
-    >
-      {/* Arrow */}
-      <div className={cn(
-        'absolute w-3 h-3 rotate-45 border',
-        variant === 'landing'
-          ? 'bottom-[-7px] left-1/2 -translate-x-1/2 lg:left-6 lg:translate-x-0 border-t-0 border-l-0 bg-[#1a1a2e] border-white/15'
-          : 'top-[-7px] right-6 border-b-0 border-r-0 bg-surface border-surface-border',
-      )} />
+    <Modal isOpen onClose={onClose} title="Instala o Moniv no iPhone" size="sm">
+      <div className="space-y-5">
 
-      {/* Header */}
-      <div className="flex items-center justify-between mb-3">
-        <p className={cn('text-sm font-bold', isDark ? 'text-white' : 'text-foreground')}>
-          Instalar no iOS
+        {/* Intro */}
+        <p className="text-sm text-foreground-muted leading-relaxed">
+          O Safari não permite instalação automática. Siga os 2 passos abaixo — demora menos de 10 segundos.
         </p>
-        <button
-          onClick={onClose}
-          aria-label="Fechar"
-          className={cn(
-            'flex h-5 w-5 items-center justify-center rounded-full text-xs transition-colors',
-            isDark ? 'bg-white/10 text-white/60 hover:bg-white/20' : 'bg-surface-elevated text-foreground-muted hover:bg-surface-border',
-          )}
-        >
-          ✕
-        </button>
-      </div>
 
-      {/* Steps */}
-      <ol className="space-y-2">
-        <li className={cn('flex items-start gap-3 text-xs', isDark ? 'text-white/80' : 'text-foreground-muted')}>
-          <span className={cn(
-            'mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full text-[10px] font-bold',
-            isDark ? 'bg-white/15 text-white' : 'bg-primary/15 text-primary',
-          )}>1</span>
-          <span>
-            Toque no ícone de partilha{' '}
-            <svg className="inline h-3.5 w-3.5 align-middle" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden>
+        {/* Step 1 */}
+        <div className="flex items-start gap-4 rounded-2xl border border-surface-border bg-surface-elevated p-4">
+          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-primary/15">
+            {/* Share icon */}
+            <svg className="h-5 w-5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
               <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
               <polyline points="16 6 12 2 8 6"/>
               <line x1="12" y1="2" x2="12" y2="15"/>
             </svg>
-            {' '}na barra do Safari
-          </span>
-        </li>
-        <li className={cn('flex items-start gap-3 text-xs', isDark ? 'text-white/80' : 'text-foreground-muted')}>
-          <span className={cn(
-            'mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full text-[10px] font-bold',
-            isDark ? 'bg-white/15 text-white' : 'bg-primary/15 text-primary',
-          )}>2</span>
-          <span>Selecione <strong className={isDark ? 'text-white' : 'text-foreground'}>"Adicionar ao Ecrã de Início"</strong></span>
-        </li>
-      </ol>
-    </div>
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground flex-shrink-0">1</span>
+              <p className="text-sm font-semibold text-foreground">Toque no ícone de Partilha</p>
+            </div>
+            <p className="text-xs text-foreground-muted">
+              Na barra inferior do Safari, toque no ícone{' '}
+              <svg className="inline h-3.5 w-3.5 align-middle text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden>
+                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+                <polyline points="16 6 12 2 8 6"/>
+                <line x1="12" y1="2" x2="12" y2="15"/>
+              </svg>
+              {' '}(quadrado com seta para cima).
+            </p>
+          </div>
+        </div>
+
+        {/* Step 2 */}
+        <div className="flex items-start gap-4 rounded-2xl border border-surface-border bg-surface-elevated p-4">
+          <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-primary/15">
+            {/* Plus square icon */}
+            <svg className="h-5 w-5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <rect x="3" y="3" width="18" height="18" rx="2"/>
+              <line x1="12" y1="8" x2="12" y2="16"/>
+              <line x1="8" y1="12" x2="16" y2="12"/>
+            </svg>
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-primary-foreground flex-shrink-0">2</span>
+              <p className="text-sm font-semibold text-foreground">Adicionar ao Ecrã de Início</p>
+            </div>
+            <p className="text-xs text-foreground-muted">
+              No menu que abre, toque em{' '}
+              <strong className="text-foreground">"Adicionar ao Ecrã de Início"</strong>
+              {' '}e depois em <strong className="text-foreground">"Adicionar"</strong>.
+            </p>
+          </div>
+        </div>
+
+        {/* Result preview */}
+        <div className="flex items-center gap-3 rounded-xl border border-accent/20 bg-accent/8 px-4 py-3">
+          <img
+            src="/logo.webp"
+            alt="Moniv"
+            className="h-9 w-9 flex-shrink-0"
+            style={{ filter: 'drop-shadow(0 2px 6px rgba(99,102,241,0.5))' }}
+          />
+          <div>
+            <p className="text-sm font-semibold text-foreground">Moniv aparece no teu início</p>
+            <p className="text-xs text-foreground-muted">Como uma app nativa, sem browser</p>
+          </div>
+          <CheckCircleIcon />
+        </div>
+
+        {/* CTA */}
+        <button
+          onClick={onClose}
+          className="w-full rounded-xl bg-primary px-4 py-3 text-sm font-bold text-primary-foreground hover:opacity-90 active:scale-[0.98] transition-all"
+        >
+          Entendido
+        </button>
+
+      </div>
+    </Modal>
   )
 }
 
 // ── Install button ────────────────────────────────────────────────────────────
-// Chrome/Android  → fires beforeinstallprompt native dialog
-// iOS Safari      → shows a minimal "Add to Home Screen" tooltip
-// Everything else → button visible, click is silent (no errors)
+// Android/Chrome  → fires beforeinstallprompt native dialog
+// iOS Safari      → opens proper centered install guide modal
+// Everything else → button passive, no errors
 
 interface InstallButtonProps {
   t: (key: string) => string
@@ -228,7 +226,9 @@ interface InstallButtonProps {
 function InstallButton({ t, variant = 'landing' }: InstallButtonProps) {
   const { isInstalled, isPrompting, canInstall, promptInstall } = usePWAInstall()
   const { platform } = usePlatformDetect()
-  const [showIOSHint, setShowIOSHint] = useState(false)
+  const [showIOSModal, setShowIOSModal] = useState(false)
+
+  const isIOS = platform === 'ios' && !canInstall
 
   if (isInstalled) {
     return (
@@ -251,68 +251,72 @@ function InstallButton({ t, variant = 'landing' }: InstallButtonProps) {
 
   const handleClick = () => {
     if (canInstall) {
-      // Chrome / Android: fires the real native prompt
       promptInstall()
     } else if (platform === 'ios') {
-      // iOS Safari: toggle the "Add to Home Screen" hint
-      setShowIOSHint(prev => !prev)
+      setShowIOSModal(true)
     }
-    // Desktop Safari / unknown: passive — no errors, no fake behaviour
   }
 
-  // Label adapts to platform so the button always makes sense to the user
   const buttonLabel = isPrompting
     ? t('install_banner.installing')
-    : platform === 'ios' && !canInstall
-      ? 'Como instalar'
-      : t('install_banner.install_btn')
+    : isIOS ? 'Como instalar' : t('install_banner.install_btn')
 
   if (variant === 'landing') {
     return (
-      <div className="relative">
+      <>
+        <div className="flex flex-col items-center gap-2 lg:items-start">
+          <button
+            onClick={handleClick}
+            disabled={isPrompting}
+            className={cn(
+              'flex items-center justify-center gap-2',
+              'rounded-2xl bg-white px-6 py-3',
+              'text-sm font-bold text-[#4338ca]',
+              'shadow-lg hover:shadow-white/30 hover:bg-white/95',
+              'active:scale-[0.97] transition-all duration-150',
+              'disabled:opacity-60 disabled:cursor-not-allowed',
+              'min-w-[160px]',
+            )}
+          >
+            <DownloadIcon />
+            {buttonLabel}
+          </button>
+          {isIOS && (
+            <p className="text-xs text-white/50">
+              No iPhone, instalação é feita pelo menu do Safari
+            </p>
+          )}
+        </div>
+        {showIOSModal && <IOSInstallModal onClose={() => setShowIOSModal(false)} />}
+      </>
+    )
+  }
+
+  return (
+    <>
+      <div className="flex flex-col gap-1.5 w-full sm:w-auto">
         <button
           onClick={handleClick}
           disabled={isPrompting}
           className={cn(
-            'flex items-center justify-center gap-2',
-            'rounded-2xl bg-white px-6 py-3',
-            'text-sm font-bold text-[#4338ca]',
-            'shadow-lg hover:shadow-white/30 hover:bg-white/95',
-            'active:scale-[0.97] transition-all duration-150',
+            'flex w-full sm:w-auto items-center justify-center gap-2',
+            'rounded-xl bg-primary px-5 py-2.5',
+            'text-sm font-bold text-primary-foreground',
+            'hover:opacity-90 active:scale-[0.97] transition-all',
             'disabled:opacity-60 disabled:cursor-not-allowed',
-            'min-w-[160px]',
           )}
         >
           <DownloadIcon />
           {buttonLabel}
         </button>
-        {showIOSHint && (
-          <IOSHint variant="landing" onClose={() => setShowIOSHint(false)} />
+        {isIOS && (
+          <p className="text-[11px] text-foreground-muted text-center sm:text-left">
+            Instalação via menu do Safari
+          </p>
         )}
       </div>
-    )
-  }
-
-  return (
-    <div className="relative">
-      <button
-        onClick={handleClick}
-        disabled={isPrompting}
-        className={cn(
-          'flex w-full sm:w-auto items-center justify-center gap-2',
-          'rounded-xl bg-primary px-5 py-2.5',
-          'text-sm font-bold text-primary-foreground',
-          'hover:opacity-90 active:scale-[0.97] transition-all',
-          'disabled:opacity-60 disabled:cursor-not-allowed',
-        )}
-      >
-        <DownloadIcon />
-        {buttonLabel}
-      </button>
-      {showIOSHint && (
-        <IOSHint variant="inline" onClose={() => setShowIOSHint(false)} />
-      )}
-    </div>
+      {showIOSModal && <IOSInstallModal onClose={() => setShowIOSModal(false)} />}
+    </>
   )
 }
 
