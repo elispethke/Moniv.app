@@ -1,4 +1,4 @@
-import { Copy, Check, Share2, Users, Gift, TrendingUp, MessageCircle, Mail } from 'lucide-react'
+import { Copy, Check, Share2, Gift, TrendingUp, MessageCircle, Mail } from 'lucide-react'
 import { Modal } from '@/components/ui/Modal'
 import { Button } from '@/components/ui/Button'
 import { useReferral } from '@/hooks/useReferral'
@@ -16,41 +16,32 @@ export function ReferralModal({ onClose }: Props) {
   const { t } = useTranslation()
 
   return (
-    <Modal
-      isOpen
-      onClose={onClose}
-      title={t('referral.title')}
-      size="sm"
-    >
-      <div className="space-y-4">
-        {/* Header icon + subtitle */}
-        <div className="flex flex-col items-center gap-3 pb-1">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-primary shadow-glow-primary">
-            <Users className="h-7 w-7 text-primary-foreground" />
-          </div>
-          <p className="text-center text-sm text-muted-foreground">
-            {t('referral.subtitle')}
-          </p>
-        </div>
+    <Modal isOpen onClose={onClose} title={t('referral.title')} size="sm">
+      <div className="space-y-3">
+
+        {/* Subtitle */}
+        <p className="text-sm text-muted-foreground text-center -mt-1">
+          {t('referral.subtitle')}
+        </p>
 
         {/* Reward badge */}
         <div className="flex items-center gap-3 rounded-2xl border border-primary/20 bg-primary/10 px-4 py-3">
-          <Gift className="h-6 w-6 flex-shrink-0 text-primary" />
+          <Gift className="h-5 w-5 flex-shrink-0 text-primary" />
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold text-foreground">
+            <p className="text-sm font-semibold text-foreground leading-tight">
               {t('referral.reward_title')}
             </p>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs text-muted-foreground mt-0.5">
               {t('referral.reward_desc')}
             </p>
           </div>
         </div>
 
-        {/* Progress indicator */}
+        {/* Progress */}
         <div className="rounded-2xl border border-surface-border bg-surface-elevated px-4 py-3">
           <div className="mb-2 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <TrendingUp className="h-4 w-4 text-accent" />
+              <TrendingUp className="h-3.5 w-3.5 text-accent" />
               <span className="text-xs font-medium text-foreground-secondary">
                 {t('referral.progress_label')}
               </span>
@@ -68,7 +59,7 @@ export function ReferralModal({ onClose }: Props) {
               />
             ))}
           </div>
-          <p className="mt-2 text-[10px] text-muted-foreground">
+          <p className="mt-1.5 text-[10px] text-muted-foreground">
             {referralCount === 0
               ? t('referral.count_zero')
               : t('referral.count', { count: referralCount })}
@@ -81,9 +72,7 @@ export function ReferralModal({ onClose }: Props) {
             <p className="mb-0.5 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
               {t('referral.your_link')}
             </p>
-            <p className="truncate font-mono text-xs text-foreground">
-              {referralLink}
-            </p>
+            <p className="truncate font-mono text-xs text-foreground">{referralLink}</p>
           </div>
         )}
 
@@ -94,18 +83,16 @@ export function ReferralModal({ onClose }: Props) {
             WhatsApp
           </Button>
           <div className="grid grid-cols-3 gap-2">
-            <Button variant="outline" size="md" onClick={copyLink} className="gap-1.5">
-              {copied
-                ? <Check className="h-4 w-4 text-accent" />
-                : <Copy className="h-4 w-4" />}
+            <Button variant="outline" size="sm" onClick={copyLink} className="gap-1">
+              {copied ? <Check className="h-3.5 w-3.5 text-accent" /> : <Copy className="h-3.5 w-3.5" />}
               {copied ? t('referral.copied') : t('referral.copy')}
             </Button>
-            <Button variant="outline" size="md" onClick={shareEmail} className="gap-1.5">
-              <Mail className="h-4 w-4" />
+            <Button variant="outline" size="sm" onClick={shareEmail} className="gap-1">
+              <Mail className="h-3.5 w-3.5" />
               Email
             </Button>
-            <Button variant="outline" size="md" onClick={shareLink} className="gap-1.5">
-              <Share2 className="h-4 w-4" />
+            <Button variant="outline" size="sm" onClick={shareLink} className="gap-1">
+              <Share2 className="h-3.5 w-3.5" />
               {t('referral.share')}
             </Button>
           </div>
@@ -114,6 +101,7 @@ export function ReferralModal({ onClose }: Props) {
         <p className="text-center text-[11px] text-muted-foreground">
           {t('referral.terms')}
         </p>
+
       </div>
     </Modal>
   )
