@@ -38,11 +38,14 @@ export function ProModal({ onClose }: ProModalProps) {
   return (
     <div
       className="fixed inset-0 z-50 flex items-end justify-center sm:items-center p-4"
-      onClick={(e) => { if (e.target === e.currentTarget) onClose() }}
+      onPointerDown={(e) => { if (e.target === e.currentTarget) onClose() }}
     >
-      <div className="absolute inset-0 bg-black/60 backdrop-blur-sm cursor-pointer" onClick={onClose} />
+      <div
+        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+        onPointerDown={onClose}
+      />
 
-      <div className="relative w-full max-w-sm rounded-3xl border border-surface-border bg-background shadow-2xl overflow-hidden animate-scale-in">
+      <div className="relative z-10 w-full max-w-sm rounded-3xl border border-surface-border bg-background shadow-2xl overflow-hidden animate-scale-in" onPointerDown={(e) => e.stopPropagation()}>
         <button
           onClick={onClose}
           className="absolute right-4 top-4 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-surface-elevated text-muted-foreground hover:text-foreground transition-colors"

@@ -19,26 +19,19 @@ const sizeClasses = {
 }
 
 export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalProps) {
-  // Bloquear scroll do body enquanto modal está aberta
+  // Block body scroll while open
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden'
-    } else {
-      document.body.style.overflow = ''
-    }
-    return () => {
-      document.body.style.overflow = ''
-    }
+    if (!isOpen) return
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = prev }
   }, [isOpen])
 
-  // Fechar ao pressionar ESC
+  // Close on ESC
   const handleKeyDown = useCallback(
-    (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
-    },
+    (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() },
     [onClose],
   )
-
   useEffect(() => {
     if (!isOpen) return
     document.addEventListener('keydown', handleKeyDown)
@@ -52,28 +45,33 @@ export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalPr
       role="dialog"
       aria-modal="true"
       aria-label={title}
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center animate-fade-in"
+      // onPointerDown on the outer layer: fires for both mouse AND touch on all browsers
+      // including iOS Safari. We only close when the click is on the overlay itself,
+      // not on the modal panel (panel calls e.stopPropagation).
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center"
+      onPointerDown={(e) => { if (e.target === e.currentTarget) onClose() }}
     >
-      {/* Backdrop — fechar ao clicar fora (cursor-pointer necessário para iOS Safari) */}
+      {/* Backdrop — visual only; pointer events handled on parent */}
       <div
         aria-hidden="true"
-        className="absolute inset-0 bg-background/80 backdrop-blur-sm cursor-pointer"
-        onClick={onClose}
+        className="absolute inset-0 bg-background/80 backdrop-blur-sm"
+        // onPointerDown here as well so clicking the backdrop itself also closes
+        onPointerDown={onClose}
       />
 
-      {/* Modal panel */}
+      {/* Modal panel — stop propagation so clicks inside don't reach the overlay */}
       <div
         className={cn(
-          'relative w-full rounded-t-3xl sm:rounded-3xl bg-surface border border-surface-border shadow-glass',
+          'relative z-10 w-full rounded-t-3xl sm:rounded-3xl bg-surface border border-surface-border shadow-glass',
           'animate-slide-up max-h-[90vh] overflow-y-auto',
           sizeClasses[size],
         )}
-        onClick={(e) => e.stopPropagation()}
+        onPointerDown={(e) => e.stopPropagation()}
       >
         {/* Handle bar — mobile drag affordance */}
         <div className="mx-auto mt-3 mb-1 h-1 w-10 rounded-full bg-surface-border sm:hidden" />
 
-        {/* Header: sempre renderizado se tem título OU sempre tem o X */}
+        {/* Header: title + X button always present */}
         <div
           className={cn(
             'flex items-center justify-between px-5 py-4',
