@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslation } from '@/hooks/useTranslation'
 import { usePWAInstall } from '@/hooks/usePWAInstall'
 import { usePlatformDetect } from '@/hooks/usePlatformDetect'
@@ -123,22 +123,47 @@ function PWAPhoneMockup() {
   )
 }
 
-// ── iOS Install Guide — proper centered modal ─────────────────────────────────
+// ── iOS Install Guide — handles both Safari and Chrome/Firefox on iOS ──────────
 
-function IOSInstallModal({ onClose }: { onClose: () => void }) {
+interface IOSInstallModalProps {
+  onClose: () => void
+  /** true = user is in iOS Safari; false = user is in Chrome/Firefox on iOS */
+  isSafari: boolean
+}
+
+function IOSInstallModal({ onClose, isSafari }: IOSInstallModalProps) {
   return (
     <Modal isOpen onClose={onClose} title="Instala o Moniv no iPhone" size="sm">
-      <div className="space-y-5">
+      <div className="space-y-4">
+
+        {/* If NOT in Safari: tell them to switch first */}
+        {!isSafari && (
+          <div className="flex items-start gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-3">
+            {/* Safari icon */}
+            <svg className="h-5 w-5 flex-shrink-0 text-amber-400 mt-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="2" y1="12" x2="22" y2="12"/>
+              <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+            </svg>
+            <div>
+              <p className="text-sm font-semibold text-amber-300">Abre no Safari primeiro</p>
+              <p className="text-xs text-amber-300/80 mt-0.5">
+                No iPhone, só o Safari permite instalar apps web. Copia o link e abre no Safari.
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Intro */}
         <p className="text-sm text-foreground-muted leading-relaxed">
-          O Safari não permite instalação automática. Siga os 2 passos abaixo — demora menos de 10 segundos.
+          {isSafari
+            ? 'Siga os 2 passos abaixo — demora menos de 10 segundos.'
+            : 'Quando estiveres no Safari, segue os passos:'}
         </p>
 
         {/* Step 1 */}
         <div className="flex items-start gap-4 rounded-2xl border border-surface-border bg-surface-elevated p-4">
           <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-primary/15">
-            {/* Share icon */}
             <svg className="h-5 w-5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
               <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
               <polyline points="16 6 12 2 8 6"/>
@@ -165,7 +190,6 @@ function IOSInstallModal({ onClose }: { onClose: () => void }) {
         {/* Step 2 */}
         <div className="flex items-start gap-4 rounded-2xl border border-surface-border bg-surface-elevated p-4">
           <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-primary/15">
-            {/* Plus square icon */}
             <svg className="h-5 w-5 text-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
               <rect x="3" y="3" width="18" height="18" rx="2"/>
               <line x1="12" y1="8" x2="12" y2="16"/>
@@ -200,7 +224,6 @@ function IOSInstallModal({ onClose }: { onClose: () => void }) {
           <CheckCircleIcon />
         </div>
 
-        {/* CTA */}
         <button
           onClick={onClose}
           className="w-full rounded-xl bg-primary px-4 py-3 text-sm font-bold text-primary-foreground hover:opacity-90 active:scale-[0.98] transition-all"
@@ -210,6 +233,51 @@ function IOSInstallModal({ onClose }: { onClose: () => void }) {
 
       </div>
     </Modal>
+  )
+}
+
+// ── iOS auto-prompt banner (shown after 3s on iOS Safari if not installed) ─────
+
+function IOSAutoBanner({ onShowGuide }: { onShowGuide: () => void }) {
+  const [visible, setVisible] = useState(false)
+
+  useEffect(() => {
+    const t = setTimeout(() => setVisible(true), 3000)
+    return () => clearTimeout(t)
+  }, [])
+
+  if (!visible) return null
+
+  return (
+    <div className="fixed bottom-0 left-0 right-0 z-[150] p-4 pb-[calc(1rem+env(safe-area-inset-bottom,0px))]">
+      <div className="mx-auto max-w-sm rounded-2xl border border-surface-border bg-surface shadow-glass p-4 flex items-center gap-3">
+        <img
+          src="/logo.webp"
+          alt="Moniv"
+          className="h-10 w-10 flex-shrink-0 rounded-xl"
+          style={{ filter: 'drop-shadow(0 2px 6px rgba(99,102,241,0.5))' }}
+        />
+        <div className="flex-1 min-w-0">
+          <p className="text-sm font-bold text-foreground">Instala o Moniv</p>
+          <p className="text-xs text-foreground-muted">Adiciona ao ecrã de início — é grátis</p>
+        </div>
+        <button
+          onClick={onShowGuide}
+          className="flex-shrink-0 rounded-xl bg-primary px-3 py-1.5 text-xs font-bold text-primary-foreground active:scale-95 transition-all"
+        >
+          Como
+        </button>
+        <button
+          onClick={() => setVisible(false)}
+          className="flex-shrink-0 h-6 w-6 flex items-center justify-center rounded-full bg-surface-elevated text-foreground-muted hover:text-foreground"
+          aria-label="Fechar"
+        >
+          <svg viewBox="0 0 24 24" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden>
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+      </div>
+    </div>
   )
 }
 
@@ -225,10 +293,11 @@ interface InstallButtonProps {
 
 function InstallButton({ t, variant = 'landing' }: InstallButtonProps) {
   const { isInstalled, isPrompting, canInstall, promptInstall } = usePWAInstall()
-  const { platform } = usePlatformDetect()
+  const { platform, isIOSDevice, isIOSSafari } = usePlatformDetect()
   const [showIOSModal, setShowIOSModal] = useState(false)
 
-  const isIOS = platform === 'ios' && !canInstall
+  // Any iOS device that can't use the native prompt → needs the guide
+  const needsIOSGuide = !canInstall && isIOSDevice
 
   if (isInstalled) {
     return (
@@ -252,14 +321,15 @@ function InstallButton({ t, variant = 'landing' }: InstallButtonProps) {
   const handleClick = () => {
     if (canInstall) {
       promptInstall()
-    } else if (platform === 'ios') {
+    } else if (isIOSDevice) {
+      // Works for both Safari iOS and Chrome/Firefox on iOS
       setShowIOSModal(true)
     }
   }
 
   const buttonLabel = isPrompting
     ? t('install_banner.installing')
-    : isIOS ? 'Como instalar' : t('install_banner.install_btn')
+    : needsIOSGuide ? 'Como instalar' : t('install_banner.install_btn')
 
   if (variant === 'landing') {
     return (
@@ -281,13 +351,21 @@ function InstallButton({ t, variant = 'landing' }: InstallButtonProps) {
             <DownloadIcon />
             {buttonLabel}
           </button>
-          {isIOS && (
+          {needsIOSGuide && (
             <p className="text-xs text-white/50">
-              No iPhone, instalação é feita pelo menu do Safari
+              {isIOSSafari
+                ? 'Usa o menu Partilhar do Safari'
+                : 'Abre no Safari para instalar'}
             </p>
           )}
         </div>
-        {showIOSModal && <IOSInstallModal onClose={() => setShowIOSModal(false)} />}
+        {showIOSModal && (
+          <IOSInstallModal isSafari={isIOSSafari} onClose={() => setShowIOSModal(false)} />
+        )}
+        {/* Auto-prompt banner only on iOS Safari (not already installed) */}
+        {isIOSSafari && platform === 'ios' && (
+          <IOSAutoBanner onShowGuide={() => setShowIOSModal(true)} />
+        )}
       </>
     )
   }
@@ -309,13 +387,19 @@ function InstallButton({ t, variant = 'landing' }: InstallButtonProps) {
           <DownloadIcon />
           {buttonLabel}
         </button>
-        {isIOS && (
+        {needsIOSGuide && (
           <p className="text-[11px] text-foreground-muted text-center sm:text-left">
-            Instalação via menu do Safari
+            {isIOSSafari ? 'Usa o menu Partilhar do Safari' : 'Abre no Safari para instalar'}
           </p>
         )}
       </div>
-      {showIOSModal && <IOSInstallModal onClose={() => setShowIOSModal(false)} />}
+      {showIOSModal && (
+        <IOSInstallModal isSafari={isIOSSafari} onClose={() => setShowIOSModal(false)} />
+      )}
+      {/* Auto-prompt banner only on iOS Safari (not already installed) */}
+      {isIOSSafari && platform === 'ios' && (
+        <IOSAutoBanner onShowGuide={() => setShowIOSModal(true)} />
+      )}
     </>
   )
 }
