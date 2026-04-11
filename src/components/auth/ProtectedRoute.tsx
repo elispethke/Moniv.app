@@ -7,9 +7,10 @@ function AppLoader() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-background">
       <img
-        src="/logo.png"
+        src="/logo.webp"
         alt="Moniv"
-        className="h-14 w-14 rounded-2xl object-cover shadow-glow-primary animate-pulse-slow"
+        className="h-14 w-14 animate-pulse-slow"
+        style={{ filter: 'drop-shadow(0 4px 16px rgba(99,102,241,0.65)) drop-shadow(0 0 6px rgba(99,102,241,0.4))' }}
       />
       <div className="h-1 w-24 overflow-hidden rounded-full bg-surface-elevated">
         <div className="h-full w-full animate-shimmer rounded-full bg-gradient-primary bg-[length:200%_100%]" />

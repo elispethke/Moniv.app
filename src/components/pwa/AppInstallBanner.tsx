@@ -79,9 +79,10 @@ export function AppInstallBanner() {
           <div className="flex min-w-0 items-center gap-3">
             <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-white/20 shadow-inner">
               <img
-                src="/logo.png"
+                src="/logo.webp"
                 alt="Moniv"
-                className="h-6 w-6 rounded-lg object-cover"
+                className="h-6 w-6"
+                style={{ filter: 'drop-shadow(0 0 5px rgba(255,255,255,0.4))' }}
               />
             </div>
             <div className="min-w-0">

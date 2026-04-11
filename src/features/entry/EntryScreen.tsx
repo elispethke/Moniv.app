@@ -31,9 +31,10 @@ export function EntryScreen() {
         {/* Logo + wordmark */}
         <div className="flex flex-col items-center gap-4">
           <img
-            src="/logo.png"
+            src="/logo.webp"
             alt="Moniv"
-            className="h-20 w-20 rounded-[1.25rem] object-cover shadow-glow-primary"
+            className="h-20 w-20"
+            style={{ filter: 'drop-shadow(0 4px 20px rgba(99,102,241,0.7)) drop-shadow(0 0 8px rgba(99,102,241,0.4))' }}
           />
           <div>
             <h1 className="text-[2.75rem] font-extrabold leading-none tracking-tight text-foreground">

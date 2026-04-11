@@ -13,7 +13,7 @@ export function Navbar() {
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
         {/* Brand — clickable, goes to dashboard */}
         <Link to="/" className="flex items-center gap-2.5">
-          <img src="/logo.png" alt="Moniv" className="h-8 w-8 rounded-lg object-cover shadow-glow-primary" />
+          <img src="/logo.webp" alt="Moniv" className="h-8 w-8" style={{ filter: 'drop-shadow(0 0 8px rgba(99,102,241,0.7))' }} />
           <span className="text-lg font-bold tracking-tight text-foreground">
             Mon<span className="text-primary">iv</span>
           </span>

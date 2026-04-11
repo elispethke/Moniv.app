@@ -13,8 +13,14 @@ export default defineConfig({
       registerType: 'autoUpdate',
       injectRegister: 'auto',
 
-      // Apenas ficheiros que realmente existem em /public
-      includeAssets: ['logo.png', 'icons/favicon.svg', 'offline.html'],
+      includeAssets: [
+        'logo.png', 'logo.webp',
+        'icons/favicon.svg',
+        'icons/logo-192.png', 'icons/logo-512.png',
+        'icons/logo-192.webp', 'icons/logo-512.webp',
+        'icons/logo-maskable.png', 'icons/logo-maskable.webp',
+        'offline.html',
+      ],
 
       manifest: {
         name: 'Moniv - Finanças Pessoais',
@@ -32,30 +38,44 @@ export default defineConfig({
         categories: ['finance', 'productivity', 'utilities'],
         prefer_related_applications: false,
 
-        // logo.png existe (1024×1024 PNG) — Chrome aceita e redimensiona
         icons: [
+          // PNG fallbacks (required — Chrome uses these for install)
           {
-            src: '/logo.png',
+            src: '/icons/logo-192.png',
             sizes: '192x192',
             type: 'image/png',
             purpose: 'any',
           },
           {
-            src: '/logo.png',
+            src: '/icons/logo-512.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'any',
           },
+          // Maskable (safe-zone padding for Android adaptive icons)
           {
-            src: '/logo.png',
-            sizes: '1024x1024',
+            src: '/icons/logo-maskable.png',
+            sizes: '512x512',
             type: 'image/png',
+            purpose: 'maskable',
+          },
+          // WebP variants (modern browsers prefer these — smaller, sharper)
+          {
+            src: '/icons/logo-192.webp',
+            sizes: '192x192',
+            type: 'image/webp',
             purpose: 'any',
           },
           {
-            src: '/logo.png',
+            src: '/icons/logo-512.webp',
             sizes: '512x512',
-            type: 'image/png',
+            type: 'image/webp',
+            purpose: 'any',
+          },
+          {
+            src: '/icons/logo-maskable.webp',
+            sizes: '512x512',
+            type: 'image/webp',
             purpose: 'maskable',
           },
         ],
@@ -66,14 +86,14 @@ export default defineConfig({
             short_name: 'Transação',
             description: 'Adicionar uma nova transação',
             url: '/transactions?action=add',
-            icons: [{ src: '/logo.png', sizes: '192x192' }],
+            icons: [{ src: '/icons/logo-192.png', sizes: '192x192', type: 'image/png' }],
           },
           {
             name: 'Dashboard',
             short_name: 'Dashboard',
             description: 'Ver resumo financeiro',
             url: '/dashboard',
-            icons: [{ src: '/logo.png', sizes: '192x192' }],
+            icons: [{ src: '/icons/logo-192.png', sizes: '192x192', type: 'image/png' }],
           },
         ],
       },

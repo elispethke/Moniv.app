@@ -72,7 +72,7 @@ export function PWAInstallBanner() {
 
       <div className="flex items-start gap-3 pr-6">
         <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl bg-primary/15">
-          <img src="/logo.png" alt="Moniv" className="h-7 w-7 rounded-lg object-cover" />
+          <img src="/logo.webp" alt="Moniv" className="h-7 w-7" style={{ filter: 'drop-shadow(0 0 6px rgba(99,102,241,0.6))' }} />
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold text-foreground">Instalar Moniv</p>

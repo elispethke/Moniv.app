@@ -13,7 +13,7 @@ import { AppDownloadSection } from '@/components/pwa/AppDownloadSection'
 function SplashLoader() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background">
-      <img src="/logo.png" alt="Moniv" className="h-12 w-12 rounded-2xl animate-pulse-slow shadow-glow-primary" />
+      <img src="/logo.webp" alt="Moniv" className="h-12 w-12 animate-pulse-slow" style={{ filter: 'drop-shadow(0 0 12px rgba(99,102,241,0.7))' }} />
     </div>
   )
 }
@@ -399,7 +399,7 @@ export function LandingPage() {
         <div className="flex h-16 w-full items-center justify-between px-6 lg:px-16 xl:px-24">
           {/* Brand */}
           <div className="flex items-center gap-2.5">
-            <img src="/logo.png" alt="Moniv" className="h-8 w-8 rounded-xl object-cover shadow-glow-primary" />
+            <img src="/logo.webp" alt="Moniv" className="h-8 w-8" style={{ filter: 'drop-shadow(0 0 8px rgba(99,102,241,0.65))' }} />
             <span className="text-lg font-extrabold text-foreground tracking-tight">
               Mon<span className="text-primary">iv</span>
             </span>
@@ -709,7 +709,7 @@ export function LandingPage() {
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             {/* Brand */}
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <img src="/logo.png" alt="Moniv" className="h-5 w-5 rounded-lg object-cover" />
+              <img src="/logo.webp" alt="Moniv" className="h-5 w-5" style={{ filter: 'drop-shadow(0 0 5px rgba(99,102,241,0.5))' }} />
               <span className="font-semibold text-foreground">Mon<span className="text-primary">iv</span></span>
               <span className="hidden sm:inline">·</span>
               <span className="hidden sm:inline">{t('landing.footer_copy', { year: String(new Date().getFullYear()) })}</span>

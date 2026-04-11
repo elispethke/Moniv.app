@@ -1,5 +1,7 @@
+import { useState, useEffect, useRef } from 'react'
 import { useTranslation } from '@/hooks/useTranslation'
 import { usePWAInstall } from '@/hooks/usePWAInstall'
+import { usePlatformDetect } from '@/hooks/usePlatformDetect'
 import { cn } from '@/utils/cn'
 
 // ── Icons ────────────────────────────────────────────────────────────────────
@@ -45,7 +47,7 @@ function PWAPhoneMockup() {
         {/* App header */}
         <div className="flex items-center justify-between px-3 py-1.5">
           <div className="flex items-center gap-1.5">
-            <img src="/logo.png" alt="" className="h-4 w-4 rounded-lg object-cover" />
+            <img src="/logo.webp" alt="" className="h-4 w-4" style={{ filter: 'drop-shadow(0 0 4px rgba(99,102,241,0.6))' }} />
             <span className="text-[8px] font-bold text-white">Moniv</span>
           </div>
           <div className="h-4 w-4 rounded-full bg-white/10 flex items-center justify-center">
@@ -120,8 +122,103 @@ function PWAPhoneMockup() {
   )
 }
 
+// ── iOS "Add to Home Screen" hint tooltip ────────────────────────────────────
+
+function IOSHint({ onClose, variant }: { onClose: () => void; variant: 'landing' | 'inline' }) {
+  const ref = useRef<HTMLDivElement>(null)
+
+  // Close on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) onClose()
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [onClose])
+
+  // Close on ESC
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+    document.addEventListener('keydown', handler)
+    return () => document.removeEventListener('keydown', handler)
+  }, [onClose])
+
+  const isDark = variant === 'landing'
+
+  return (
+    <div
+      ref={ref}
+      role="tooltip"
+      className={cn(
+        'absolute z-50 w-72 rounded-2xl p-4 shadow-2xl',
+        'border animate-fade-in',
+        // Position: above the button on landing, below on inline
+        variant === 'landing'
+          ? 'bottom-full mb-3 left-1/2 -translate-x-1/2 lg:left-0 lg:translate-x-0'
+          : 'top-full mt-2 right-0',
+        isDark
+          ? 'bg-[#1a1a2e] border-white/15'
+          : 'bg-surface border-surface-border',
+      )}
+    >
+      {/* Arrow */}
+      <div className={cn(
+        'absolute w-3 h-3 rotate-45 border',
+        variant === 'landing'
+          ? 'bottom-[-7px] left-1/2 -translate-x-1/2 lg:left-6 lg:translate-x-0 border-t-0 border-l-0 bg-[#1a1a2e] border-white/15'
+          : 'top-[-7px] right-6 border-b-0 border-r-0 bg-surface border-surface-border',
+      )} />
+
+      {/* Header */}
+      <div className="flex items-center justify-between mb-3">
+        <p className={cn('text-sm font-bold', isDark ? 'text-white' : 'text-foreground')}>
+          Instalar no iOS
+        </p>
+        <button
+          onClick={onClose}
+          aria-label="Fechar"
+          className={cn(
+            'flex h-5 w-5 items-center justify-center rounded-full text-xs transition-colors',
+            isDark ? 'bg-white/10 text-white/60 hover:bg-white/20' : 'bg-surface-elevated text-foreground-muted hover:bg-surface-border',
+          )}
+        >
+          ✕
+        </button>
+      </div>
+
+      {/* Steps */}
+      <ol className="space-y-2">
+        <li className={cn('flex items-start gap-3 text-xs', isDark ? 'text-white/80' : 'text-foreground-muted')}>
+          <span className={cn(
+            'mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full text-[10px] font-bold',
+            isDark ? 'bg-white/15 text-white' : 'bg-primary/15 text-primary',
+          )}>1</span>
+          <span>
+            Toque no ícone de partilha{' '}
+            <svg className="inline h-3.5 w-3.5 align-middle" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden>
+              <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+              <polyline points="16 6 12 2 8 6"/>
+              <line x1="12" y1="2" x2="12" y2="15"/>
+            </svg>
+            {' '}na barra do Safari
+          </span>
+        </li>
+        <li className={cn('flex items-start gap-3 text-xs', isDark ? 'text-white/80' : 'text-foreground-muted')}>
+          <span className={cn(
+            'mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full text-[10px] font-bold',
+            isDark ? 'bg-white/15 text-white' : 'bg-primary/15 text-primary',
+          )}>2</span>
+          <span>Selecione <strong className={isDark ? 'text-white' : 'text-foreground'}>"Adicionar ao Ecrã de Início"</strong></span>
+        </li>
+      </ol>
+    </div>
+  )
+}
+
 // ── Install button ────────────────────────────────────────────────────────────
-// Always rendered. Fires the native prompt when available; silent otherwise.
+// Chrome/Android  → fires beforeinstallprompt native dialog
+// iOS Safari      → shows a minimal "Add to Home Screen" tooltip
+// Everything else → button visible, click is silent (no errors)
 
 interface InstallButtonProps {
   t: (key: string) => string
@@ -129,7 +226,9 @@ interface InstallButtonProps {
 }
 
 function InstallButton({ t, variant = 'landing' }: InstallButtonProps) {
-  const { isInstalled, isPrompting, promptInstall } = usePWAInstall()
+  const { isInstalled, isPrompting, canInstall, promptInstall } = usePWAInstall()
+  const { platform } = usePlatformDetect()
+  const [showIOSHint, setShowIOSHint] = useState(false)
 
   if (isInstalled) {
     return (
@@ -137,9 +236,7 @@ function InstallButton({ t, variant = 'landing' }: InstallButtonProps) {
         'flex items-center gap-3 rounded-2xl border border-white/20 px-5 py-3 backdrop-blur-sm',
         variant === 'landing' ? 'bg-white/10' : 'bg-surface-elevated',
       )}>
-        <div className="text-accent">
-          <CheckCircleIcon />
-        </div>
+        <div className="text-accent"><CheckCircleIcon /></div>
         <div>
           <p className={cn('text-sm font-bold', variant === 'landing' ? 'text-white' : 'text-foreground')}>
             {t('install_banner.installed_title')}
@@ -152,42 +249,63 @@ function InstallButton({ t, variant = 'landing' }: InstallButtonProps) {
     )
   }
 
+  const handleClick = () => {
+    if (canInstall) {
+      // Chrome / Android: fire the real native prompt
+      promptInstall()
+    } else if (platform === 'ios') {
+      // iOS Safari: toggle the "Add to Home Screen" hint
+      setShowIOSHint(prev => !prev)
+    }
+    // Desktop Safari / unknown: do nothing — button is visible but passive
+  }
+
   if (variant === 'landing') {
     return (
+      <div className="relative">
+        <button
+          onClick={handleClick}
+          disabled={isPrompting}
+          className={cn(
+            'flex items-center justify-center gap-2',
+            'rounded-2xl bg-white px-6 py-3',
+            'text-sm font-bold text-[#4338ca]',
+            'shadow-lg hover:shadow-white/30 hover:bg-white/95',
+            'active:scale-[0.97] transition-all duration-150',
+            'disabled:opacity-60 disabled:cursor-not-allowed',
+            'min-w-[160px]',
+          )}
+        >
+          <DownloadIcon />
+          {isPrompting ? t('install_banner.installing') : t('install_banner.install_btn')}
+        </button>
+        {showIOSHint && (
+          <IOSHint variant="landing" onClose={() => setShowIOSHint(false)} />
+        )}
+      </div>
+    )
+  }
+
+  return (
+    <div className="relative">
       <button
-        onClick={() => { promptInstall() }}
+        onClick={handleClick}
         disabled={isPrompting}
         className={cn(
-          'flex items-center justify-center gap-2',
-          'rounded-2xl bg-white px-6 py-3',
-          'text-sm font-bold text-[#4338ca]',
-          'shadow-lg hover:shadow-white/30 hover:bg-white/95',
-          'active:scale-[0.97] transition-all duration-150',
+          'flex w-full sm:w-auto items-center justify-center gap-2',
+          'rounded-xl bg-primary px-5 py-2.5',
+          'text-sm font-bold text-primary-foreground',
+          'hover:opacity-90 active:scale-[0.97] transition-all',
           'disabled:opacity-60 disabled:cursor-not-allowed',
-          'min-w-[160px]',
         )}
       >
         <DownloadIcon />
         {isPrompting ? t('install_banner.installing') : t('install_banner.install_btn')}
       </button>
-    )
-  }
-
-  return (
-    <button
-      onClick={() => { promptInstall() }}
-      disabled={isPrompting}
-      className={cn(
-        'flex w-full sm:w-auto items-center justify-center gap-2',
-        'rounded-xl bg-primary px-5 py-2.5',
-        'text-sm font-bold text-primary-foreground',
-        'hover:opacity-90 active:scale-[0.97] transition-all',
-        'disabled:opacity-60 disabled:cursor-not-allowed',
+      {showIOSHint && (
+        <IOSHint variant="inline" onClose={() => setShowIOSHint(false)} />
       )}
-    >
-      <DownloadIcon />
-      {isPrompting ? t('install_banner.installing') : t('install_banner.install_btn')}
-    </button>
+    </div>
   )
 }
 
@@ -209,7 +327,7 @@ function InlineCard({ t }: { t: (key: string) => string }) {
             {/* Icon + text */}
             <div className="flex flex-1 items-start gap-4">
               <div className="hidden sm:flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-primary/15">
-                <img src="/logo.png" alt="Moniv" className="h-8 w-8 rounded-xl object-cover" />
+                <img src="/logo.webp" alt="Moniv" className="h-8 w-8" style={{ filter: 'drop-shadow(0 0 8px rgba(99,102,241,0.6))' }} />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-base font-bold text-foreground leading-tight">

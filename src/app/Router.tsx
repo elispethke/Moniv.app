@@ -45,10 +45,11 @@ function PageSkeleton() {
     <div className="flex min-h-[60vh] items-center justify-center">
       <div className="flex flex-col items-center gap-3">
         <img
-          src="/logo.png"
+          src="/logo.webp"
           alt=""
           aria-hidden
-          className="h-10 w-10 rounded-2xl animate-pulse-slow opacity-60"
+          className="h-10 w-10 animate-pulse-slow opacity-70"
+          style={{ filter: 'drop-shadow(0 0 8px rgba(99,102,241,0.5))' }}
         />
         <div className="h-1 w-24 rounded-full bg-primary/20 animate-pulse" />
       </div>
@@ -69,8 +70,10 @@ function InviteRedirect() {
 
 function AppShell() {
   return (
-    <>
+    <div className="flex flex-col min-h-screen">
       <Navbar />
+      {/* flex-1 so the content grows; bottom padding clears the fixed BottomNav (h-16 + pb-safe ≤ 98px) */}
+      <main className="flex-1" style={{ paddingBottom: 'calc(7rem + env(safe-area-inset-bottom, 0px))' }}>
       <Routes>
         <Route
           path="/transactions"
@@ -178,12 +181,13 @@ function AppShell() {
       </Routes>
 
       {/* App download section — inline card visible on all authenticated pages */}
-      <div className="mx-auto max-w-6xl xl:max-w-7xl px-4 xl:px-6 pb-2">
+      <div className="mx-auto max-w-6xl xl:max-w-7xl px-4 xl:px-6">
         <AppDownloadSection variant="inline" />
       </div>
+      </main>
 
       <BottomNav />
-    </>
+    </div>
   )
 }
 

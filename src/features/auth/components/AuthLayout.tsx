@@ -24,7 +24,7 @@ export function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
 
       {/* Logo */}
       <div className="mb-8 flex flex-col items-center gap-3 animate-fade-in">
-        <img src="/logo.png" alt="Moniv" className="h-14 w-14 rounded-2xl object-cover shadow-glow-primary" />
+        <img src="/logo.webp" alt="Moniv" className="h-14 w-14" style={{ filter: 'drop-shadow(0 4px 16px rgba(99,102,241,0.65)) drop-shadow(0 0 6px rgba(99,102,241,0.4))' }} />
         <span className="text-2xl font-extrabold tracking-tight text-foreground">
           Mon<span className="text-primary">iv</span>
         </span>

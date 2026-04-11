@@ -74,7 +74,7 @@ export function LegalPage({ title, subtitle, lastUpdated, sections }: LegalPageP
         {/* Footer */}
         <div className="mt-12 border-t border-surface-border pt-8 text-center">
           <div className="flex items-center justify-center gap-2 mb-3">
-            <img src="/logo.png" alt="Moniv" className="h-6 w-6 rounded-lg object-cover" />
+            <img src="/logo.webp" alt="Moniv" className="h-6 w-6" style={{ filter: 'drop-shadow(0 0 6px rgba(99,102,241,0.6))' }} />
             <span className="font-semibold text-foreground">
               Mon<span className="text-primary">iv</span>
             </span>
