@@ -66,7 +66,7 @@ export function BottomNav() {
   }
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-surface-border bg-background/90 backdrop-blur-md pb-safe">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-surface-border bg-background/90 backdrop-blur-md pb-safe px-safe">
       <div className="mx-auto max-w-md relative">
         {/* ── Animated active indicator pill — DOM-measured position ─────────── */}
         {indicatorStyle && (

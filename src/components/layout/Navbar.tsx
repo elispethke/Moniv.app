@@ -9,7 +9,7 @@ export function Navbar() {
   const { isPro, isAdmin } = useUserPlan()
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-surface-border bg-background/80 backdrop-blur-md">
+    <header className="sticky top-0 z-40 w-full border-b border-surface-border bg-background/80 backdrop-blur-md pt-safe">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
         {/* Brand — clickable, goes to dashboard */}
         <Link to="/" className="flex items-center gap-2.5">

@@ -72,8 +72,9 @@ function AppShell() {
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
-      {/* flex-1 so the content grows; bottom padding clears the fixed BottomNav (h-16 + pb-safe ≤ 98px) */}
-      <main className="flex-1" style={{ paddingBottom: 'calc(7rem + env(safe-area-inset-bottom, 0px))' }}>
+      {/* flex-1 so the content grows; bottom padding clears the fixed BottomNav:
+           h-16 (64px nav content) + env(safe-area-inset-bottom) + 8px breathing room */}
+      <main className="flex-1" style={{ paddingBottom: 'calc(4.5rem + env(safe-area-inset-bottom, 0px))' }}>
       <Routes>
         <Route
           path="/transactions"
