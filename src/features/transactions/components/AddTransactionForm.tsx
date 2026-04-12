@@ -1,4 +1,4 @@
-import { AlertCircle, DollarSign, FileText, Calendar } from 'lucide-react'
+import { AlertCircle, DollarSign, FileText, Calendar, Sparkles } from 'lucide-react'
 import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
 import { Button } from '@/components/ui/Button'
@@ -30,6 +30,7 @@ export function AddTransactionForm({
     setDescription,
     category,
     setCategory,
+    categoryAutoDetected,
     date,
     setDate,
     categories,
@@ -93,14 +94,25 @@ export function AddTransactionForm({
         error={fieldErrors.description}
       />
 
-      <Select
-        label={t('transactions.form.category')}
-        value={category}
-        onChange={(e) => setCategory(e.target.value)}
-        options={categories}
-        placeholder={t('transactions.form.category_placeholder')}
-        error={fieldErrors.category}
-      />
+      <div className="relative">
+        <Select
+          label={t('transactions.form.category')}
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          options={categories}
+          placeholder={t('transactions.form.category_placeholder')}
+          error={fieldErrors.category}
+        />
+        {categoryAutoDetected && (
+          <span className={cn(
+            'absolute right-8 top-[2.1rem] flex items-center gap-1',
+            'text-[10px] font-semibold text-primary pointer-events-none',
+          )}>
+            <Sparkles className="h-2.5 w-2.5" />
+            sugerido
+          </span>
+        )}
+      </div>
 
       <Input
         label={t('transactions.form.date')}
